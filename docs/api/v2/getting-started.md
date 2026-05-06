@@ -1,0 +1,87 @@
+# Getting started
+
+*Base URL, request format, encoding, and a first end-to-end example.*
+
+This page walks you through your first call to the Velip Public API v2. You will need:
+
+- A Velip account with API access enabled.
+- A `tsid` token (or HTTP Basic credentials). See [Authentication](authentication.md).
+- Optionally, your IP added to the allowlist if your account enforces IP restrictions.
+
+## Base URL
+
+Replace `<base>` with the host provided to your account (typically `https://vox.velip.com.br`):
+
+```
+https://<base>/api/v2/<EndpointName>.php
+```
+
+## Request format
+
+You can send parameters in three ways. They are interchangeable; URL-query takes precedence when both URL and JSON body define the same key.
+```bash curl (form)
+curl -X POST 'https://<base>/api/v2/MakeSMS.php' \
+  -d 'tsid=YOUR_TSID' \
+  -d 'dest=5511999999999' \
+  -d 'message=Hello from Velip'
+```
+
+```bash curl (JSON)
+curl -X POST 'https://<base>/api/v2/MakeSMS.php' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "tsid": "YOUR_TSID",
+    "dest": "5511999999999",
+    "message": "Hello from Velip"
+  }'
+```
+
+```bash curl (HTTP Basic)
+curl -X POST 'https://<base>/api/v2/MakeSMS.php' \
+  -u "username:password" \
+  -d 'dest=5511999999999' \
+  -d 'message=Hello from Velip'
+```
+## Response format
+
+Successful calls return HTTP `200` with this shape:
+
+```json
+{
+  "return": {
+    "status": "OK",
+    "status_code": "0",
+    "cd_id": "..."
+  }
+}
+```
+
+Failures return HTTP `400` (business / validation error) or `401` (authentication / authorization). The `status_code` field carries a numeric code documented in [Error codes](errors.md).
+
+## Encoding
+
+> **Warning**
+> Some legacy endpoints (especially TTS) return non-UTF-8 fields. When sending non-ASCII characters (accented Portuguese/Spanish), prefer JSON requests, or pass `encoding=UTF-8` (where supported by the endpoint) so the server transcodes accents correctly before storing them.
+
+
+- Plain `application/x-www-form-urlencoded` requests are interpreted in `ISO-8859-1` unless the endpoint sets `mysqli_set_charset(...,'utf8mb4')` (newer endpoints do).
+- JSON requests are interpreted in `UTF-8` automatically.
+- For TTS calls, the `encoding` parameter accepts `UTF-8`, `2UTF-8` (double-encoded), and `ASCII`.
+
+## Phone number format
+
+For Brazilian numbers, the API can normalize the number for you:
+
+- Pass `setbrasil=1` (default in most endpoints): the API accepts `0DDD`, `DDD`, or `55DDD…` and normalizes to `55<DDD><number>`. Mobile numbers gain the leading `9` automatically when missing for relevant DDDs.
+- Pass `setbrasil=0` to keep the number exactly as given (use it for international destinations).
+
+## Idempotency / duplicate protection
+
+Most send endpoints take an `httpdup` parameter (seconds, 1-600). When set, the API rejects duplicate requests with the same destination within the window. Pass `httpdup=0` to disable.
+
+## What to read next
+
+- [Authentication](authentication.md) — issuing tokens, IP allowlist, brute-force protection.
+- [Errors](errors.md) — the canonical numeric codes returned in `status_code`.
+- [Rate limits](rate-limits.md) — quotas and per-account caps.
+- Any of the channel pages: [SMS](sms/MakeSMS.md), [WhatsApp](whatsapp/MakeWhatsapp.md), [Voice](voice/MakeTTSCall.md).

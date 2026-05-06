@@ -1,0 +1,167 @@
+# Get call status / list calls
+
+*Query call records (single or paginated) and optionally push them to a webhook.*
+
+
+**Endpoint:** `POST https://<base>/api/v2/GetCallStatus.php`
+
+Returns call records — a single call when you pass `cd_id` or `ctid`, or a paginated list when you pass campaign / date filters. When you supply `rurl`, results are POSTed to your webhook in either JSON or URL-encoded format instead of being returned in the response body.
+
+This is the polling counterpart to the per-account return URL configured via the Velip portal.
+
+## Authentication
+
+Token authentication required. See [Authentication](../authentication.md).
+
+## Request
+
+#### `tsid` — type: *string* — **required**
+
+Token for the account.
+
+
+#### `cd_id` — type: *string*
+
+Single call id, in the form `<cdcs_db>_<numeric>` returned by [`MakeTTSCall`](MakeTTSCall.md). When supplied, returns one record.
+
+
+#### `ctid` — type: *string*
+
+Customer-side correlation id. Pass `null` to query records with empty `ctid`.
+
+
+#### `cp_id` — type: *integer*
+
+Campaign id (`cd_programa.cp_id`). Returns all calls for the campaign.
+
+
+#### `cpid` — type: *string*
+
+Customer-side campaign id (`cd_programa.cp_ctid`). Resolved internally to the latest matching `cp_id`.
+
+
+#### `date_start` — type: *string*
+
+Start date (`YYYY-MM-DD`). Alias `dini`.
+
+
+#### `date_end` — type: *string*
+
+End date (`YYYY-MM-DD`). Alias `dend`.
+
+
+#### `maxreg` — type: *integer* — default: `1000`
+
+Maximum records returned per page. Pass `-1` for unlimited (use with care). The endpoint actually fetches `maxreg + 1` rows so it can detect whether more pages exist.
+
+
+#### `last_id` — type: *integer*
+
+Cursor for pagination. Pass the `pagination.next_id` of the previous response.
+
+
+#### `onlydtmf` — type: *integer*
+
+When `1`, only return calls where the user pressed at least one digit (any of `cd_resp_1`, `cd_resp_2`, `cd_resp_3` non-empty).
+
+
+#### `numtype` — type: *string*
+
+Format for the destination number in the response. Empty = `DDI+DDD+number`, `0DDD` = `0+DDD+number`, `DDD` = `DDD+number` (Brazilian numbers only).
+
+
+#### `origin` — type: *string* — default: `api`
+
+Marker echoed back in `origin`. Allowed `[a-zA-Z0-9_-]{1,32}`; otherwise reset to `api`.
+
+
+### Webhook delivery
+
+Pass `rurl` to deliver the results to your endpoint instead of receiving them inline. Per-account defaults are used when these fields are omitted.
+
+#### `rurl` — type: *string*
+
+Public URL that receives the data.
+
+
+#### `rurl_method` — type: *string*
+
+`POST` or `GET`. Default is the customer's `cdcs_return_url_type`.
+
+
+#### `rurl_type` — type: *string*
+
+`json` to deliver as a JSON body; otherwise URL-encoded form parameters per call. Default is the customer's `cdcs_return_data_type`.
+
+
+#### `rurl_headers` — type: *string*
+
+Newline-separated extra headers (`Header: value`).
+
+
+#### `rurl_user` — type: *string*
+
+HTTP Basic username for the webhook.
+
+
+#### `rurl_password` — type: *string*
+
+HTTP Basic password for the webhook.
+
+
+## Response
+```json 200 OK (inline)
+{
+  "return": {
+    "status": "OK",
+    "status_code": "0",
+    "pagination": { "has_more": true, "next_id": 9876544 }
+  },
+  "calls": [
+    {
+      "cd_id": 9876545,
+      "cd_status": "OK",
+      "cd_amdasw": "ND",
+      "cp_id": 555,
+      "cpid": "lote-2026-05-06",
+      "ctid": "row-42",
+      "origin": "api",
+      "dest": "5511999999999",
+      "date": "2026-05-06",
+      "time_dial": "10:00:01",
+      "time_start": "10:00:08",
+      "time_end": "10:00:35",
+      "dur": 27,
+      "resp_1": "1",
+      "resp_2": "12345",
+      "resp_3": "0",
+      "route": "Mobile BR",
+      "rate": "0,050",
+      "value": "0,050",
+      "cdr_url": "https://...",
+      "cdr_sec": 27
+    }
+  ]
+}
+```
+- **`calls[].cd_amdasw`** (*string*) — Answering-machine detection result: `MA` (machine), `HM` (human), `ND` (not determined). Only meaningful when AMD was enabled on the campaign.
+
+
+- **`calls[].resp_1, resp_2, ...`** (*string*) — DTMF responses captured during the call. Number of `resp_*` keys is dynamic — depends on how many digits the IVR collected.
+
+
+- **`calls[].cdr_url`** (*string*) — Recording URL when recording was enabled. `cdr_sec` carries the duration in seconds.
+
+
+- **`return.pagination.has_more`** (*boolean*) — Present only when `maxreg` is set. `true` when more pages exist.
+
+
+- **`return.pagination.next_id`** (*integer*) — Cursor to pass as `last_id` on the next page.
+
+
+## Error codes
+
+This endpoint inherits the [global authentication codes](../errors.md). It does not raise endpoint-specific business codes — invalid filters simply produce an empty `calls` list.
+
+> **Note**
+> This endpoint is read-only on the call records (`cd_envia_*`), but writes to `cd_returl` when `rurl` is supplied — to track whether the webhook delivery succeeded. `cd_returl > 0` = delivered, `< 0` = retries failed.

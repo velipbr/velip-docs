@@ -1,0 +1,110 @@
+# Validate WhatsApp number
+
+*Verify Meta credentials, business id, and phone number id for a WhatsApp Cloud API line.*
+
+
+**Endpoint:** `POST https://<base>/api/v2/ValidateWhatsAppNumber.php`
+
+Probes the Meta Graph API with a candidate WhatsApp Cloud configuration and returns whether it is usable. Useful when onboarding a new WhatsApp line: you can verify the credentials before saving them in `cd_v8_line`.
+
+## Authentication
+
+Token authentication required. See [Authentication](../authentication.md).
+
+## Request
+
+#### `tsid` — type: *string* — **required**
+
+Token for the account.
+
+
+#### `wa_api_key` — type: *string* — **required**
+
+Meta access token (`Bearer`) with at least `whatsapp_business_management` or `whatsapp_business_messaging` scopes.
+
+
+#### `wa_business_id` — type: *string* — **required**
+
+Meta WhatsApp Business Account id.
+
+
+#### `wa_phone_number_id` — type: *string* — **required**
+
+Meta phone number id (the numeric id, not the phone number itself).
+
+
+#### `wa_number` — type: *string* — **required**
+
+Phone number in international format, digits only (e.g., `5511999999999`). Must match the number registered for the `wa_phone_number_id`.
+
+
+## Behavior
+
+The endpoint performs three checks against the Meta Graph API (v22.0):
+
+1. `GET /{wa_business_id}` — verifies the business account exists and the token can access it.
+2. `GET /{wa_phone_number_id}` — verifies the phone number id resolves to the same number as `wa_number`.
+3. `GET /debug_token` — verifies the token has at least one WhatsApp scope.
+
+## Request example
+```bash curl
+curl -X POST 'https://<base>/api/v2/ValidateWhatsAppNumber.php' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "tsid": "YOUR_TSID",
+    "wa_api_key": "EAAH...",
+    "wa_business_id": "1234567890",
+    "wa_phone_number_id": "9876543210",
+    "wa_number": "5511999999999"
+  }'
+```
+## Response
+```json 200 OK (valid)
+{
+  "return": {
+    "status": "OK",
+    "status_code": "0",
+    "result": {
+      "valid": true,
+      "business_name": "Acme LLC",
+      "phone_display_number": "+55 11 9 9999-9999",
+      "phone_verified_name": "Acme",
+      "phone_quality_rating": "GREEN",
+      "token_is_valid": true,
+      "token_scopes": ["whatsapp_business_messaging", "whatsapp_business_management"],
+      "configuration_status": "Configuration validated successfully"
+    }
+  }
+}
+```
+
+```json 400 Validation
+{
+  "return": {
+    "status": "Phone validation error: ...",
+    "status_code": "245",
+    "result": {
+      "valid": false,
+      "error_type": "PHONE_ERROR",
+      "error_message": "Invalid phone number id",
+      "http_code": 400
+    }
+  }
+}
+```
+## Error codes
+
+| Code | `status` | Cause |
+| --- | --- | --- |
+| `230` | `No wa_api_key` | Missing token. |
+| `231` | `No wa_business_id` | Missing business id. |
+| `232` | `No wa_phone_number_id` | Missing phone number id. |
+| `233` | `No wa_number` | Missing number. |
+| `234` | `Invalid number format` | Number not in `1-9` digits-only international format. |
+| `240` | `Business validation error` | Meta returned an error on the business id check. |
+| `245` | `Phone validation error` | Meta returned an error on the phone number id check. |
+| `246` | `Number mismatch` | The phone number registered for the id differs from `wa_number`. |
+| `251` | `Token validation error` | Token is expired or lacks the required WhatsApp scopes. |
+
+> **Note**
+> This endpoint does not modify any database row. It is purely diagnostic.

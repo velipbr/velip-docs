@@ -1,0 +1,110 @@
+# Create destination list
+
+*Upload or stream a destination list (CSV / JSON) to use in voice campaigns.*
+
+
+**Endpoint:** `POST https://<base>/api/v2/CreateDestinationBase.php`
+
+Creates a destination list (`cd_lista_cadastro`) you can later attach to [`CreateCampaign`](../campaigns/CreateCampaign.md) via `cdlc_id`. Four input modes:
+
+- **JSON body** (`Content-Type: application/json`) — `datajson` carries an array of destination objects.
+- **Form-urlencoded** (`Content-Type: application/x-www-form-urlencoded`) — `datajson` is a stringified JSON.
+- **Multipart CSV upload** — any field name carrying a `.csv` file.
+- **Multipart JSON upload** — any field name carrying a `.json` file.
+
+The endpoint persists the list and returns the new id along with the number of valid destinations and the on-disk size.
+
+## Authentication
+
+Token authentication required. See [Authentication](../authentication.md).
+
+## Request
+
+#### `tsid` — type: *string* — **required**
+
+Token for the account.
+
+
+#### `name` — type: *string*
+
+Friendly name for the list. Defaults to `API_<file|json>_<cdcs_id>_<timestamp>` when omitted.
+
+
+#### `ctid` — type: *string*
+
+Customer-side correlation id for the list (`cdlc_ctid`).
+
+
+#### `datajson` — type: *object[] | string*
+
+Array of destination records (or stringified JSON). Each record should contain at least the `phone` field; additional fields like `name`, `extra1..4`, `cod_cli` map to the `cd_customer.<cdcs_db_cadastro>` columns and become available as TTS placeholders.
+
+
+#### `file` — type: *file*
+
+Multipart file with a `.csv` or `.json` extension.
+
+
+## CSV format
+
+Tab- or comma-separated. The first row is the header. Recognized columns include:
+
+- `phone` (or `tel`/`telefone`/`numero`) — destination number.
+- `name` (or `nome`).
+- `cod_cli`.
+- `extra1`, `extra2`, `extra3`, `extra4`.
+
+Numbers are normalized via the per-account configuration; mobile/landline detection happens during ingestion.
+
+## Request example
+```bash curl (JSON body)
+curl -X POST 'https://<base>/api/v2/CreateDestinationBase.php' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "tsid": "YOUR_TSID",
+    "name": "Welcome lot 2026-05",
+    "ctid": "lot-A",
+    "datajson": [
+      { "phone": "5511999999999", "name": "Alice", "cod_cli": "001" },
+      { "phone": "5511988888888", "name": "Bob",   "cod_cli": "002" }
+    ]
+  }'
+```
+
+```bash curl (CSV upload)
+curl -X POST 'https://<base>/api/v2/CreateDestinationBase.php' \
+  -F 'tsid=YOUR_TSID' \
+  -F 'name=Welcome lot 2026-05' \
+  -F 'file=@destinations.csv'
+```
+## Response
+```json 200 OK
+{
+  "return": {
+    "status": "OK",
+    "status_code": "0",
+    "cdlc_id": "12345",
+    "num_dest": "4500",
+    "base_size": "412380"
+  }
+}
+```
+- **`return.cdlc_id`** (*string*) — Internal id of the destination list. Pass as `cdlc_id` to [`CreateCampaign`](../campaigns/CreateCampaign.md).
+
+
+- **`return.num_dest`** (*string*) — Number of destinations imported and considered valid (passed phone-number normalization).
+
+
+- **`return.base_size`** (*string*) — Size in bytes of the file persisted on the upload server.
+
+
+## Error codes
+
+| Code | `status` | Cause |
+| --- | --- | --- |
+| `205` | `not allowed executable file` | The uploaded file extension is rejected. |
+| `210` | (auth message) | Authentication failed and was forwarded from `log_api_v2`. |
+| `230` | `Erro na base ...` | The internal upload service returned an error or zero valid destinations. |
+
+> **Note**
+> Lists are stored on the upload server and processed asynchronously. `num_dest` reflects only the records that were validated synchronously — additional cleanup (deduplication, block-list filtering) happens at campaign-generation time.

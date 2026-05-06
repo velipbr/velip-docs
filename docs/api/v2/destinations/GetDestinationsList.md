@@ -1,0 +1,81 @@
+# List / activate destination lists
+
+*Search destination lists and optionally toggle their active flag.*
+
+
+**Endpoint:** `POST https://<base>/api/v2/GetDestinationsList.php`
+
+Returns destination lists (`cd_lista_cadastro`) registered for the customer, with optional filters by id, customer ctid, free-text search, or activation flag. Supports `setactive` to flip the `cdlc_ativo` flag in-place for the records that match the query.
+
+## Authentication
+
+Token authentication required. See [Authentication](../authentication.md).
+
+## Request
+
+#### `tsid` — type: *string* — **required**
+
+Token for the account.
+
+
+#### `cdlc_id` — type: *integer*
+
+Filter by list id.
+
+
+#### `ctid` — type: *string*
+
+Filter by customer-side correlation id (`cdlc_ctid`). Takes precedence over `cdlc_id` and `search`.
+
+
+#### `search` — type: *string*
+
+Free-text search across `cdlc_nome` and `cdlc_file_name` (`LIKE %term%`). Used only when neither `ctid` nor `cdlc_id` are set.
+
+
+#### `list` — type: *string* — default: `1`
+
+Filter by active state. `1` (default) only active, `0` only inactive, `all` both.
+
+
+#### `setactive` — type: *integer*
+
+Pass `1` to force matching lists to active, `0` to force them to inactive. Combine with the filters above to scope the operation.
+
+
+#### `maxreg` — type: *integer* — default: `100`
+
+Maximum number of records to return.
+
+
+## Request example
+```bash curl
+curl -X POST 'https://<base>/api/v2/GetDestinationsList.php' \
+  -H 'Content-Type: application/json' \
+  -d '{ "tsid": "YOUR_TSID", "search": "welcome", "maxreg": 50 }'
+```
+## Response
+```json 200 OK
+{
+  "return": { "status": "OK", "status_code": "0" },
+  "lists": [
+    {
+      "cdlc_id": 12345,
+      "cdlc_active": 1,
+      "cdlc_ctid": "lot-A",
+      "cdlc_name": "Welcome lot 2026-05",
+      "cdlc_file": "destinations.csv",
+      "cdlc_date": "2026-05-06",
+      "cdlc_num": 4500
+    }
+  ]
+}
+```
+## Error codes
+
+| Code | `status` | Cause |
+| --- | --- | --- |
+| `500` | `internal error` | Database error preparing/running the query. |
+
+> **Note**
+> The endpoint silently activates / deactivates rows when `setactive` is supplied — there is no separate "activate list" endpoint. Use it together with a tight filter to avoid touching unrelated lists.

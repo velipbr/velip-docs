@@ -1,0 +1,83 @@
+# Delete WhatsApp template
+
+*Delete a template from Meta, locally, or both.*
+
+
+**Endpoint:** `POST https://<base>/api/v2/DeleteWhatsappTemplate.php`
+
+Deletes a WhatsApp template. You choose where the deletion is propagated:
+
+- **`meta_only`** (default) — calls `DELETE` on the Meta Graph API and marks the local row `cwt_status='DELETED'`, but keeps the row for history.
+- **`local_only`** — removes the row from `cc_wa_templates` only. Use this when the template is not yet on Meta or you want to start over.
+- **`both`** — deletes on Meta and removes the row locally.
+
+A deletion record is added to `cc_wa_template_sends`.
+
+## Authentication
+
+Token authentication required. See [Authentication](../authentication.md).
+
+## Request
+
+#### `tsid` — type: *string* — **required**
+
+Token for the account.
+
+
+#### `template_id` — type: *integer* — **required**
+
+Local id of the template (`cc_wa_templates.cwt_id`).
+
+
+#### `v8l_id` — type: *integer* — **required**
+
+ID of the WhatsApp line.
+
+
+#### `delete_mode` — type: *string* — default: `meta_only`
+
+Where to apply the deletion. One of `meta_only`, `local_only`, `both`.
+
+
+## Request example
+```bash curl
+curl -X POST 'https://<base>/api/v2/DeleteWhatsappTemplate.php' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "tsid": "YOUR_TSID",
+    "template_id": 123,
+    "v8l_id": 1234,
+    "delete_mode": "both"
+  }'
+```
+## Response
+```json 200 OK
+{
+  "return": {
+    "status": "OK",
+    "status_code": "0",
+    "template_id": "123",
+    "result": {
+      "template_id": 123,
+      "meta_template_id": "456789012345678",
+      "template_name": "shipment_update",
+      "deleted": true,
+      "delete_mode": "both",
+      "message": "Template deleted on Meta API and locally"
+    }
+  }
+}
+```
+## Error codes
+
+| Code | `status` | Cause |
+| --- | --- | --- |
+| `230` | `No template_id` | Missing or non-numeric `template_id`. |
+| `233` | `No API key` | Line is missing the Meta access token. |
+| `234` | `No Business ID` | Line is missing the Meta business id. |
+| `235` | `Linha WhatsApp not found` | Line is missing, inactive, or wrong customer. |
+| `236` | `No v8l_id` | Missing or non-numeric `v8l_id`. |
+| `238` | `Template not found` | `template_id` does not belong to the customer/line. |
+| `239` | `Template not yet sent to Meta` | Cannot use `meta_only` / `both` because `cwt_template_id` is empty. Use `local_only`. |
+| `260` | `Meta API delete error` | Meta rejected the delete; the upstream message is in `result.error_message`. |
+| `270` | `Error deleting local template` | Database error after Meta deletion succeeded. |

@@ -6,7 +6,7 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Mintlify / Node (in case we add an OpenAPI build step later)
+# Optional local tooling / Node builds
 node_modules/
 .next/
 .cache/

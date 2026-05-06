@@ -2,58 +2,52 @@
 
 Public documentation for the **Velip** communications platform.
 
-This repository hosts the source content for the Velip developer portal — published with [Mintlify](https://mintlify.com/) and rendered at `docs.velip.com.br` (Mintlify subdomain in the meantime).
+This repository is written in **plain Markdown** so it reads well on [GitHub](https://github.com/velipbr/velip-docs) (file tree, search, and blame). Cross-page links use **relative paths** (e.g. `../authentication.md`) so they work when browsing the repo on github.com.
 
-> **Reading on GitHub?** Cross-page links inside the `.mdx` files (e.g. `[Authentication](/docs/api/v2/authentication)`) use **Mintlify routes** — no file extension. They only resolve once the portal is live. While the portal is being set up, navigate the source files using the GitHub file tree on the left, or open the `.mdx` files directly:
->
-> - [`docs/api/v2/overview.mdx`](docs/api/v2/overview.mdx)
-> - [`docs/api/v2/getting-started.mdx`](docs/api/v2/getting-started.mdx)
-> - [`docs/api/v2/authentication.mdx`](docs/api/v2/authentication.mdx)
-> - [`docs/api/v2/errors.mdx`](docs/api/v2/errors.mdx)
-> - [`docs/api/v2/rate-limits.mdx`](docs/api/v2/rate-limits.mdx)
+**Start here:** [`docs/introduction.md`](docs/introduction.md) — product overview and links into the API manual.
 
 ## What you find here
 
-- **API v2 manual** — every endpoint of `https://<base>/api/v2/*.php`, with parameters, request examples, response shapes, and per-endpoint error codes.
-- **Cross-cutting guides** — authentication (token-based `tsid`), global error codes, rate limits, brute-force protection.
+- **API v2 manual** — every public endpoint under `https://<base>/api/v2/*.php`: parameters, examples, responses, and endpoint-specific error codes.
+- **Cross-cutting guides** — [authentication](docs/api/v2/authentication.md), [error codes](docs/api/v2/errors.md), [rate limits](docs/api/v2/rate-limits.md), [getting started](docs/api/v2/getting-started.md).
 
 ## Layout
 
 ```
 docs/
-  introduction.mdx               # portal landing
+  introduction.md              # landing / overview for integrators
   api/v2/
-    overview.mdx
-    getting-started.mdx
-    authentication.mdx
-    errors.mdx
-    rate-limits.mdx
-    sms/                         # SMS endpoints
-    whatsapp/                    # WhatsApp endpoints
-    voice/                       # Voice / TTS / WebRTC
-    audio-files/                 # Audio file management
-    campaigns/                   # Campaigns and queues
-    destinations/                # Destination lists
-    messenger/                   # Facebook Messenger
-    instagram/                   # Instagram Direct
-    email/                       # Email via Gmail OAuth
-    auth-token/                  # Authentication helpers
-mint.json                        # Mintlify navigation/theme config
-openapi/                         # (optional) OpenAPI 3.1 spec for "Try it"
+    README.md                  # index of all v2 pages (GitHub-friendly)
+    overview.md
+    getting-started.md
+    authentication.md
+    errors.md
+    rate-limits.md
+    sms/
+    whatsapp/
+    voice/
+    audio-files/
+    campaigns/
+    destinations/
+    messenger/
+    instagram/
+    email/
+    auth-token/
+scripts/
+  convert_mdx_to_md.py         # one-off MDX → MD (reference)
+  fix_broken_doc_links.py      # repair relative links if needed
 ```
-
-Both Mintlify and plain GitHub render this content. MDX components (`<ParamField>`, `<ResponseField>`, `<RequestExample>`, `<Note>`, `<Warning>`) get the rich UI in Mintlify and degrade gracefully on GitHub.
 
 ## Editing
 
-1. Clone the repo, edit the relevant `.mdx` file, push to a branch.
-2. Mintlify GitHub App auto-builds a preview URL on every PR.
-3. Merging to `main` deploys to the production portal.
+1. Edit the relevant `.md` file under `docs/`.
+2. Keep internal links **relative** to the file you are editing (same rule as above).
+3. Open a PR against `main`.
 
 ## Out of scope
 
-- SDKs / client libraries — not yet maintained.
-- Internal architecture, deployment guides, runbooks — those live in private repos.
+- SDKs / client libraries — not maintained in this repo.
+- Internal architecture and runbooks — private repos only.
 
 ## Contact
 

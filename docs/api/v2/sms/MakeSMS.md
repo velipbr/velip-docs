@@ -1,0 +1,175 @@
+# Send SMS
+
+*Send a single SMS message via the customer's configured provider.*
+
+
+**Endpoint:** `POST https://<base>/api/v2/MakeSMS.php`
+
+Sends a single SMS message to one destination through the SMS provider configured for the customer (`Wavy`, `Tww`, `Flash`, `Matrix`, or the default Velip SMS gateway).
+
+Use [`MakeTTSCall`](../voice/MakeTTSCall.md) when you need a voice call instead.
+
+## Authentication
+
+Token authentication required. See [Authentication](../authentication.md).
+
+## Request
+
+#### `tsid` — type: *string* — **required**
+
+Token issued for the account. Can also be sent as `Authorization: Bearer <token>` or `sid`.
+
+
+#### `dest` — type: *string* — **required**
+
+Destination phone number. With `setbrasil=1` (default) accepts `0DDD9XXXXYYYY`, `DDD9XXXXYYYY`, or `55DDD9XXXXYYYY`.
+
+
+#### `message` — type: *string* — **required**
+
+Message body (max 160 characters by default). Aliases `text` and `msg_text` are accepted.
+
+
+#### `ctid` — type: *string*
+
+Customer-side correlation ID, persisted with the message log so you can match delivery later.
+
+
+#### `setbrasil` — type: *integer* — default: `1`
+
+When `1`, normalizes Brazilian numbers (DDD without leading 0, mobile 9th-digit fix). Set to `0` for international destinations.
+
+
+#### `cuttext` — type: *string*
+
+Pass `1` or `yes` to truncate at 160 characters instead of returning error `238` when text is longer.
+
+
+#### `httpdup` — type: *integer* — default: `10`
+
+Duplicate-suppression window in seconds (1–600). A second send to the same destination inside the window returns code `244`. Set `0` to disable.
+
+
+#### `from` — type: *string*
+
+Optional sender id forwarded to providers that support it.
+
+
+#### `cp_id` — type: *string*
+
+Optional campaign id (when the SMS belongs to a campaign created via [`CreateCampaign`](../campaigns/CreateCampaign.md)).
+
+
+#### `cd_id` — type: *string*
+
+Optional reference to a related voice call (`<cdcs_db>_<cd_id>` format) for analytics.
+
+
+#### `provider` — type: *string*
+
+Override the SMS provider — only honored for the Velip ADM account (`cdcs_id = 2`). Allowed: `tww`, `flash`, `matrix`.
+
+
+## Request example
+```bash curl
+curl -X POST 'https://<base>/api/v2/MakeSMS.php' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "tsid": "YOUR_TSID",
+    "dest": "5511999999999",
+    "message": "Your verification code is 4321.",
+    "ctid": "order-abc-123",
+    "httpdup": 60
+  }'
+```
+
+```php PHP
+<?php
+$ch = curl_init('https://<base>/api/v2/MakeSMS.php');
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+    'tsid'    => 'YOUR_TSID',
+    'dest'    => '5511999999999',
+    'message' => 'Your verification code is 4321.',
+    'ctid'    => 'order-abc-123',
+    'httpdup' => 60,
+]));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($ch);
+echo $response;
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://<base>/api/v2/MakeSMS.php",
+    json={
+        "tsid": "YOUR_TSID",
+        "dest": "5511999999999",
+        "message": "Your verification code is 4321.",
+        "ctid": "order-abc-123",
+        "httpdup": 60,
+    },
+    timeout=15,
+)
+print(response.json())
+```
+## Response
+```json 200 OK
+{
+  "return": {
+    "status": "OK",
+    "status_code": "0",
+    "cdls_id": "1234567"
+  }
+}
+```
+
+```json 400 Validation
+{
+  "return": {
+    "status": "Mobile is not valid",
+    "status_code": "240",
+    "cdls_id": "0"
+  }
+}
+```
+- **`return.status`** (*string*) — `OK` on success; otherwise a short message describing the error (mirrors `status_code`).
+
+
+- **`return.status_code`** (*string*) — `0` on success; otherwise the numeric error code from the table below.
+
+
+- **`return.cdls_id`** (*string*) — Internal SMS log id (`cd_log_sms_*.cdls_id`). Use it to correlate with provider delivery reports.
+
+
+## Error codes
+
+In addition to the [global authentication codes](../errors.md), `MakeSMS` may return:
+
+| Code | `status` | Cause |
+| --- | --- | --- |
+| `220` | `No sms account` | Customer is not provisioned for SMS via the requested provider. |
+| `230` | `No dest` | `dest` parameter missing. |
+| `235` | `No text` | None of `message` / `text` / `msg_text` were sent. |
+| `238` | `Text NN ch more than 160 ch` | Body exceeded 160 chars and `cuttext` is not enabled. |
+| `240` | `Mobile is not valid` | Number failed Brazilian mobile-format checks. |
+| `244` | `http duplicidade` | Duplicate within the `httpdup` window. |
+| `245` | `night limit` | Customer's night cap (22:00–06:00) reached. |
+| `250` | `no credit` | Insufficient balance on the account or its reseller chain. |
+| `255` | `no sms tarif` | No SMS tariff configured for the destination. |
+| `260` | `number blocked by list` | Destination is on the customer's block list. |
+| `270` | `Blocked text` | Body matched the bank-impersonation filter and no model match was found. |
+| `300` | `error sms provider` | Upstream provider returned a hard error. The provider's raw response is logged in `cdls_return_log`. |
+
+> **Note**
+> When the upstream provider takes too long to acknowledge, the API returns `status_code: 1` with `status: "WR"` (`waiting response`). The message is recorded; check delivery via your reports.
+
+
+## Notes
+
+- The 160-character limit refers to a single SMS segment in GSM-7. Some providers split longer messages into concatenated parts charged separately — using `cuttext=1` keeps you within a single segment.
+- The provider picked depends on `cd_customer_com.cdcc_sms_provider` for your account. Pricing differs per provider and per destination range; the API logs both `cdls_value` (your price) and `cdls_cost` (Velip's cost) for reconciliation.
+- Ignore the `provider` parameter unless you are operating the Velip ADM account (`cdcs_id = 2`) — it is silently ignored otherwise.
