@@ -1,0 +1,85 @@
+---
+title: "Google RISC events"
+description: "Inbound endpoint for Google's Cross-Account Protection (RISC) Security Event Tokens."
+api: "POST https://<base>/api/v2/GoogleRISC.php"
+---
+
+Receives [Security Event Tokens](https://openid.net/specs/openid-event-tokens-1_0.html) emitted by Google's [Cross-Account Protection (RISC) API](https://developers.google.com/identity/protocols/risc). When a Google account that's linked to a Velip user changes state (sessions revoked, account disabled, password reset required, etc.), Google posts a signed JWT to this endpoint and Velip reacts by forcing reauthentication or disabling the affected user.
+
+Like the budget webhook, this endpoint is **inbound from Google**, not for customer integrations. It is documented here so that operations and security teams can reproduce the integration in their own infrastructure if needed.
+
+## Authentication
+
+The endpoint validates a JWT signed by Google's RISC keys (`https://accounts.google.com/.well-known/risc-configuration`):
+
+1. Parses the JWT (header, payload, signature).
+2. Validates `iss` against the official RISC issuer.
+3. Validates `aud` against the configured `GOOGLE_CLIENT_ID` (`getCredential('GOOGLE_CLIENT_ID')`).
+4. Verifies the signature with the JWKS keys (`firebase/php-jwt`). RISC tokens do not expire.
+
+There is no `tsid`. The integration is registered with Google through their RISC API; once registered, Google posts SETs to this URL whenever events fire.
+
+## Request
+
+The request body is a raw JWT (string) — not JSON. The decoded payload follows Google's [RISC SET schema](https://developers.google.com/identity/protocols/risc#2_handle_security_events):
+
+```json (decoded payload)
+{
+  "iss": "https://accounts.google.com/",
+  "aud": "<your client id>",
+  "iat": 1746537600,
+  "jti": "abc123...",
+  "events": {
+    "https://schemas.openid.net/secevent/risc/event-type/account-disabled": {
+      "subject": { "subject_type": "iss-sub", "iss": "https://accounts.google.com/", "sub": "1010101010" },
+      "reason": "hijacking"
+    }
+  }
+}
+```
+
+## Supported events
+
+| Event type (short) | Velip action |
+| --- | --- |
+| `sessions-revoked` | Mark user as `expired`, force re-auth on next login. |
+| `tokens-revoked` / `token-revoked` | Same. |
+| `account-credential-change-required` | Same. |
+| `account-disabled` (`reason: hijacking`) | Force re-auth. |
+| `account-disabled` (other reasons) | Disable login (`cdcsu_login_type = 'notuser'`). |
+| `account-purged` | Disable login. |
+| `account-enabled` | Re-enable login (only if previously `notuser`). |
+| `verification` | Logged; no state change. |
+
+For all events, a row is added to `cd_acessos` with `cdac_origin = 'google_risc'`.
+
+## Response
+
+<ResponseExample>
+
+```json 202 Accepted
+{ "status": "accepted" }
+```
+
+```json 400 Bad Request
+{ "error": "Invalid issuer" }
+```
+
+```json 405 Method Not Allowed
+{ "error": "Method Not Allowed" }
+```
+
+</ResponseExample>
+
+## Status codes
+
+| HTTP | Meaning |
+| --- | --- |
+| `202` | SET accepted (events processed). |
+| `400` | JWT parsing or validation failed (issuer, audience, signature). |
+| `405` | Method not `POST`. |
+| `500` | `GOOGLE_CLIENT_ID` not configured or RISC discovery document unreachable. |
+
+<Note>
+RISC tokens cannot be replayed — Google sends them once. If you reject one with `400`, Google will retry with backoff, but persistent rejections may pause the stream. Monitor the `cd_acessos` log for `RISC:` entries to confirm events are being processed.
+</Note>

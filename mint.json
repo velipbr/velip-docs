@@ -1,0 +1,124 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Velip",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "favicon": "/favicon.png",
+  "colors": {
+    "primary": "#0B5FFF",
+    "light": "#5B8DEF",
+    "dark": "#003FB3"
+  },
+  "topbarLinks": [
+    { "name": "Status", "url": "https://status.velip.com" },
+    { "name": "Contact", "url": "mailto:support@velip.com" }
+  ],
+  "topbarCtaButton": {
+    "name": "Sign in",
+    "url": "https://app.velip.com"
+  },
+  "anchors": [
+    { "name": "API v2", "icon": "code", "url": "docs/api/v2/overview" }
+  ],
+  "navigation": [
+    {
+      "group": "Get started",
+      "pages": [
+        "docs/introduction"
+      ]
+    },
+    {
+      "group": "API v2",
+      "pages": [
+        "docs/api/v2/overview",
+        "docs/api/v2/getting-started",
+        "docs/api/v2/authentication",
+        "docs/api/v2/errors",
+        "docs/api/v2/rate-limits"
+      ]
+    },
+    {
+      "group": "SMS",
+      "pages": [
+        "docs/api/v2/sms/MakeSMS"
+      ]
+    },
+    {
+      "group": "WhatsApp",
+      "pages": [
+        "docs/api/v2/whatsapp/MakeWhatsapp",
+        "docs/api/v2/whatsapp/ValidateWhatsAppNumber",
+        "docs/api/v2/whatsapp/CreateWhatsappTemplate",
+        "docs/api/v2/whatsapp/GetWATemplates",
+        "docs/api/v2/whatsapp/DeleteWhatsappTemplate",
+        "docs/api/v2/whatsapp/CheckTemplateStatus"
+      ]
+    },
+    {
+      "group": "Voice (TTS)",
+      "pages": [
+        "docs/api/v2/voice/MakeTTSCall",
+        "docs/api/v2/voice/GetCallStatus",
+        "docs/api/v2/voice/GetTTSVoices",
+        "docs/api/v2/voice/PlayAudioFile",
+        "docs/api/v2/voice/GetWebRTC"
+      ]
+    },
+    {
+      "group": "Audio files",
+      "pages": [
+        "docs/api/v2/audio-files/CreateAudioFile",
+        "docs/api/v2/audio-files/GetAudiosList"
+      ]
+    },
+    {
+      "group": "Campaigns",
+      "pages": [
+        "docs/api/v2/campaigns/CreateCampaign",
+        "docs/api/v2/campaigns/ChangeCampaign",
+        "docs/api/v2/campaigns/GetCampaignsList",
+        "docs/api/v2/campaigns/CreateCenterQueue",
+        "docs/api/v2/campaigns/GetCenterQueues"
+      ]
+    },
+    {
+      "group": "Destinations",
+      "pages": [
+        "docs/api/v2/destinations/CreateDestinationBase",
+        "docs/api/v2/destinations/GetDestinationsList"
+      ]
+    },
+    {
+      "group": "Other channels",
+      "pages": [
+        "docs/api/v2/messenger/MakeMessenger",
+        "docs/api/v2/instagram/MakeInstagram"
+      ]
+    },
+    {
+      "group": "Email",
+      "pages": [
+        "docs/api/v2/email/SendGmailOAuth",
+        "docs/api/v2/email/OAuthActions"
+      ]
+    },
+    {
+      "group": "Auth helpers",
+      "pages": [
+        "docs/api/v2/auth-token/GetUserID"
+      ]
+    },
+    {
+      "group": "Webhooks",
+      "pages": [
+        "docs/api/v2/webhooks/GcpBudgetAlert",
+        "docs/api/v2/google-risc/GoogleRISC"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "website": "https://velip.com.br"
+  }
+}

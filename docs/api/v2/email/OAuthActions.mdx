@@ -1,0 +1,129 @@
+---
+title: "OAuth helper actions (Gmail)"
+description: "Test, revoke, delete, send, and list emails through OAuth-linked Gmail accounts."
+api: "POST https://<base>/api/v2/OAuthActions.php"
+---
+
+Internal helper endpoint used by the Velip portal to manage Gmail OAuth connections. Unlike the rest of the API, this endpoint authenticates via the user's PHP session (not via `tsid`) — it is intended for use from the portal UI, not from external integrations.
+
+If you need to send transactional email programmatically, use [`SendGmailOAuth`](/docs/api/v2/email/SendGmailOAuth) instead.
+
+## Authentication
+
+Session-based: the call must be made from a browser where the user is signed in to the Velip portal. Calls without a valid PHP session return:
+
+```json
+{ "success": false, "message": "Sessão inválida ou expirada." }
+```
+
+Token authentication (`tsid`) is **not** accepted by this endpoint.
+
+## Request
+
+<ParamField body="action" type="string" required>
+  Action to perform. One of:
+  
+  - `test_connection` — calls `GET /me/profile` on Gmail to verify the OAuth grant.
+  - `revoke_connection` — revokes the refresh token on Google's side and marks the local row revoked.
+  - `delete_connection` — deletes the local OAuth row (keeps the Google grant intact).
+  - `send_email` — sends a one-off email through the connection (used by the portal's "Send test" panel).
+  - `list_emails` — lists previously sent emails for the customer with date / status filters.
+  - `view_email` — fetches the full record of one previously sent email.
+</ParamField>
+
+<ParamField body="cdoc_id" type="integer">
+  ID of the OAuth connection (`cd_oauth_connections.cdoc_id`). Required for `test_connection`, `revoke_connection`, `delete_connection`, and `send_email`.
+</ParamField>
+
+### `send_email` parameters
+
+<ParamField body="to_email" type="string" required>
+  Recipient address.
+</ParamField>
+
+<ParamField body="subject" type="string" required>
+  Email subject.
+</ParamField>
+
+<ParamField body="body_html" type="string" required>
+  HTML body.
+</ParamField>
+
+<ParamField body="cc_email" type="string">
+  Comma-separated CC list.
+</ParamField>
+
+<ParamField body="bcc_email" type="string">
+  Comma-separated BCC list.
+</ParamField>
+
+<ParamField body="reply_to" type="string">
+  `Reply-To` address.
+</ParamField>
+
+### `list_emails` parameters
+
+<ParamField body="date_from" type="string" default="-30 days">
+  Start date `YYYY-MM-DD`.
+</ParamField>
+
+<ParamField body="date_to" type="string" default="today">
+  End date `YYYY-MM-DD`.
+</ParamField>
+
+<ParamField body="filter_status" type="string">
+  Filter by status (e.g., `OK`, `FAIL`).
+</ParamField>
+
+<ParamField body="filter_account" type="integer">
+  Filter by `cdoc_id` (specific OAuth connection).
+</ParamField>
+
+<ParamField body="page" type="integer" default="1">
+  Pagination cursor (50 per page).
+</ParamField>
+
+### `view_email` parameter
+
+<ParamField body="cdem_id" type="integer" required>
+  Email log id (`cd_emails_a.cdem_id` or per-customer email table).
+</ParamField>
+
+## Response
+
+All actions return a JSON envelope `{"success": true|false, ...}`. The shape varies by action:
+
+```json test_connection
+{ "success": true, "message": "Connection OK", "email": "sales@acme.com" }
+```
+
+```json revoke_connection
+{ "success": true, "message": "Autorização revogada." }
+```
+
+```json send_email
+{ "success": true, "message_id": "<...@mail.gmail.com>" }
+```
+
+```json list_emails
+{
+  "success": true,
+  "emails": [ { "cdem_id": 1, "cdem_to_email": "lead@example.com", "cdem_subject": "...", "cdem_status": "OK" } ],
+  "total": 42,
+  "page": 1,
+  "per_page": 50,
+  "pages": 1
+}
+```
+
+## Errors
+
+There is no numeric `status_code` here — failures return `{"success": false, "message": "<reason>"}` with HTTP `200`. The most common reasons:
+
+- `Sessão inválida ou expirada.` — no PHP session cookie or session timed out.
+- `Conexão não encontrada ou sem permissão.` — `cdoc_id` does not belong to the authenticated customer.
+- `Ação desconhecida: ...` — invalid `action` value.
+
+<Warning>
+This endpoint is **not** intended for external integrations. It is documented here only because some portal-embedded automations call it directly. For programmatic email sending, use [`SendGmailOAuth`](/docs/api/v2/email/SendGmailOAuth).
+</Warning>

@@ -1,0 +1,61 @@
+---
+title: "Rate limits"
+description: "Per-IP, per-user, and per-channel quotas enforced by the API."
+---
+
+The Velip API enforces three layers of throttling. They are independent — a request may be rejected for hitting any of them.
+
+## 1. Anti brute-force (authentication)
+
+Counted on **failed** attempts only. See [Authentication](/docs/api/v2/authentication) for the full table.
+
+| Counter | Window | Result |
+| --- | --- | --- |
+| 20 failed attempts per IP | 10 minutes | Code `131` until the window passes. |
+| 5 failed attempts per user | 10 minutes | Code `132` for that user. |
+| 100 failed attempts per IP | 60 minutes | **Permanent** IP blacklist (code `199`). |
+| 50 failed credential attempts per IP | 60 minutes | **Permanent** IP blacklist (code `199`). |
+| 15 unknown-SID errors (`102`) per IP | 10 minutes | **Permanent** IP blacklist (anti-probe, code `199`). |
+
+## 2. HTTP duplicate suppression
+
+Per-endpoint, opt-in. Most send endpoints accept `httpdup` (seconds, 1–600) and reject a second request to the same destination within the window.
+
+```bash
+# Reject duplicates within 60 s
+curl -X POST 'https://<base>/api/v2/MakeSMS.php' \
+  -d 'tsid=YOUR_TSID' -d 'dest=5511999999999' \
+  -d 'message=Hi' -d 'httpdup=60'
+```
+
+Pass `httpdup=0` to disable. The default behaviour without `httpdup` is **a 10-second** dedup window in most send endpoints, applied automatically.
+
+When triggered, the API returns code `244` (`http duplicidade` / `http duplicity`).
+
+## 3. Channel quotas
+
+Some channels enforce additional caps independent of authentication and dedup.
+
+### SMS night limit (Brazil)
+
+Between **22:00 and 06:00 (server time)**, every customer has a configurable night cap on outbound SMS (`cdcs_sms_nightlimit`, default **300**). When the cap is hit, the API returns code `245` (`night limit`) and rejects further sends for the night.
+
+The cap counts only successful sends originated by `MakeSMS` for the customer.
+
+### Customer balance
+
+Send endpoints check `cdcs_saldo > cdcs_saldo_limite` before issuing the message and return code `250` (`no credit`) when balance is insufficient. Resellers' children also need their parent's balance to clear the same check.
+
+### Block lists
+
+Each customer maintains a destination block list (`cd_bloqueados_cli`). Sends to a blocked destination return code `260` (`number blocked by list`).
+
+### Per-call regional / holiday block
+
+Voice and SMS endpoints can apply a regional time block (DDD-level) when the customer enables it (`bkddd=1` or `bkddd=2`). Sends outside the configured window return code `230` (`block ddd time`). With `bkddd=2`, the message is queued silently rather than rejected outright.
+
+## Recommendations
+
+- For high-volume integrations, batch sends through a queue and respect the duplicate-suppression window — repeated retries amplify the brute-force counters.
+- Enable the IP allowlist (`cd_ip`) so leaked tokens cannot be used from foreign hosts; this also means a misconfigured deploy that lacks allowlist entries will return `142` rather than burn quota.
+- When integrating from a fleet of servers, route requests from a stable egress IP (or a small allowlisted set) to make rate-limit accounting predictable.

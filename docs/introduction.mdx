@@ -1,0 +1,51 @@
+---
+title: "Welcome to Velip"
+description: "Multichannel communications and AI agents for contact centers — voice, SMS, WhatsApp, Messenger, Instagram, and email under a single API."
+---
+
+Velip is a Brazilian communications platform that powers contact centers, marketing teams, and product apps with a single backend for **voice, SMS, WhatsApp, Messenger, Instagram, and email**, plus AI agents (autonomous and real-time voice) on top of it.
+
+These docs cover what consumers of the **Velip Public API** need to integrate. Internal product manuals (call center UI, agent design tools) live elsewhere.
+
+## What is here
+
+<CardGroup cols={2}>
+  <Card title="API v2 reference" icon="code" href="/docs/api/v2/overview">
+    The public REST endpoints — request, response, errors, and authentication.
+  </Card>
+  <Card title="Authentication" icon="key" href="/docs/api/v2/authentication">
+    How to obtain and use a `tsid` token, IP allowlists, and session policies.
+  </Card>
+  <Card title="Rate limits" icon="gauge-high" href="/docs/api/v2/rate-limits">
+    Per-IP, per-user, and per-channel limits (incl. SMS night cap).
+  </Card>
+  <Card title="Error codes" icon="triangle-exclamation" href="/docs/api/v2/errors">
+    The full list of error codes returned by the API and what they mean.
+  </Card>
+</CardGroup>
+
+## Channels at a glance
+
+| Channel | Endpoints | Notes |
+| --- | --- | --- |
+| **Voice (TTS / call)** | `MakeTTSCall`, `GetCallStatus`, `GetTTSVoices`, `PlayAudioFile`, `GetWebRTC` | Outbound TTS with DTMF/IVR, transfer to PA, recording, WebRTC. |
+| **SMS** | `MakeSMS` | 160-char limit (auto-cut available); per-customer providers (Matrix, Wavy/Tww, Flash). |
+| **WhatsApp** | `MakeWhatsapp`, `ValidateWhatsAppNumber`, `CreateWhatsappTemplate`, `GetWATemplates`, `DeleteWhatsappTemplate`, `CheckTemplateStatus` | HSM/templates, text/audio/image/file/video, Gupshup or Meta Cloud API providers. |
+| **Messenger / Instagram** | `MakeMessenger`, `MakeInstagram` | Meta channels via business accounts. |
+| **Email** | `SendGmailOAuth`, `OAuthActions` | Gmail OAuth-backed sender. |
+| **Campaigns / queues** | `CreateCampaign`, `ChangeCampaign`, `GetCampaignsList`, `CreateCenterQueue`, `GetCenterQueues` | Campaign lifecycle and contact-center queue management. |
+| **Destinations** | `CreateDestinationBase`, `GetDestinationsList` | Manage destination lists used by campaigns. |
+| **Auth / utilities** | `GetUserID`, OAuth helpers | Token issuance and account introspection. |
+| **Audio files** | `CreateAudioFile`, `GetAudiosList` | Upload / list audio assets used by voice campaigns. |
+| **Webhooks** | `GcpBudgetAlert`, `GoogleRISC` | Inbound notifications from cloud providers. |
+
+<Note>
+All endpoints are POST-by-default and accept `application/json` or `application/x-www-form-urlencoded`. URL parameters override JSON body keys.
+</Note>
+
+## Conventions used in these docs
+
+- Sample base URL: `https://<base>` — replace with the host provided to your account (typically `https://vox.velip.com.br`).
+- Examples use `curl`. Most endpoints work the same with any HTTP client.
+- Token placeholder: `YOUR_TSID`. Get one via [Authentication](/docs/api/v2/authentication).
+- Parameters marked **required** must be sent; otherwise the endpoint returns an error code listed under each endpoint page.
