@@ -2,7 +2,15 @@
 
 Public documentation for the **Velip** communications platform.
 
-This repository hosts the source content for the Velip developer portal — published with [Mintlify](https://mintlify.com/) and rendered at `docs.velip.com` (Mintlify subdomain in the meantime).
+This repository hosts the source content for the Velip developer portal — published with [Mintlify](https://mintlify.com/) and rendered at `docs.velip.com.br` (Mintlify subdomain in the meantime).
+
+> **Reading on GitHub?** Cross-page links inside the `.mdx` files (e.g. `[Authentication](/docs/api/v2/authentication)`) use **Mintlify routes** — no file extension. They only resolve once the portal is live. While the portal is being set up, navigate the source files using the GitHub file tree on the left, or open the `.mdx` files directly:
+>
+> - [`docs/api/v2/overview.mdx`](docs/api/v2/overview.mdx)
+> - [`docs/api/v2/getting-started.mdx`](docs/api/v2/getting-started.mdx)
+> - [`docs/api/v2/authentication.mdx`](docs/api/v2/authentication.mdx)
+> - [`docs/api/v2/errors.mdx`](docs/api/v2/errors.mdx)
+> - [`docs/api/v2/rate-limits.mdx`](docs/api/v2/rate-limits.mdx)
 
 ## What you find here
 
