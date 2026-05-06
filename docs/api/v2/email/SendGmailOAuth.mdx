@@ -10,7 +10,7 @@ Use this when you want emails to come from your own Gmail/Google Workspace ident
 
 ## Authentication
 
-Token authentication required. See [Authentication](/docs/api/v2/authentication). Additionally, the `from_email` must already be linked to your customer in `cd_oauth_connections` — call [`OAuthActions`](/docs/api/v2/email/OAuthActions) to manage that link.
+Token authentication required. See [Authentication](/docs/api/v2/authentication). Additionally, the `from_email` must already be linked to your customer through the Velip portal's Gmail OAuth onboarding flow (records stored in `cd_oauth_connections` + `cd_oauth_providers`).
 
 ## Request
 
@@ -121,5 +121,5 @@ curl -X POST 'https://<base>/api/v2/SendGmailOAuth.php' \
 | `210` | (provider message) | Gmail OAuth class returned an error (token revoked, scope insufficient, send failed). |
 
 <Note>
-The OAuth token is refreshed automatically. If the refresh token has been revoked from the Google account, this endpoint returns code `210` with the upstream error message — re-link the account through [`OAuthActions`](/docs/api/v2/email/OAuthActions) to recover.
+The OAuth token is refreshed automatically. If the refresh token has been revoked from the Google account, this endpoint returns code `210` with the upstream error message — re-link the account in the Velip portal to recover.
 </Note>

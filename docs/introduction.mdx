@@ -32,12 +32,11 @@ These docs cover what consumers of the **Velip Public API** need to integrate. I
 | **SMS** | `MakeSMS` | 160-char limit (auto-cut available); per-customer providers (Matrix, Wavy/Tww, Flash). |
 | **WhatsApp** | `MakeWhatsapp`, `ValidateWhatsAppNumber`, `CreateWhatsappTemplate`, `GetWATemplates`, `DeleteWhatsappTemplate`, `CheckTemplateStatus` | HSM/templates, text/audio/image/file/video, Gupshup or Meta Cloud API providers. |
 | **Messenger / Instagram** | `MakeMessenger`, `MakeInstagram` | Meta channels via business accounts. |
-| **Email** | `SendGmailOAuth`, `OAuthActions` | Gmail OAuth-backed sender. |
+| **Email** | `SendGmailOAuth` | Gmail OAuth-backed sender. |
 | **Campaigns / queues** | `CreateCampaign`, `ChangeCampaign`, `GetCampaignsList`, `CreateCenterQueue`, `GetCenterQueues` | Campaign lifecycle and contact-center queue management. |
 | **Destinations** | `CreateDestinationBase`, `GetDestinationsList` | Manage destination lists used by campaigns. |
-| **Auth / utilities** | `GetUserID`, OAuth helpers | Token issuance and account introspection. |
+| **Auth / utilities** | `GetUserID` | Token issuance and account introspection. |
 | **Audio files** | `CreateAudioFile`, `GetAudiosList` | Upload / list audio assets used by voice campaigns. |
-| **Webhooks** | `GcpBudgetAlert`, `GoogleRISC` | Inbound notifications from cloud providers. |
 
 <Note>
 All endpoints are POST-by-default and accept `application/json` or `application/x-www-form-urlencoded`. URL parameters override JSON body keys.

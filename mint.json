@@ -100,21 +100,13 @@
     {
       "group": "Email",
       "pages": [
-        "docs/api/v2/email/SendGmailOAuth",
-        "docs/api/v2/email/OAuthActions"
+        "docs/api/v2/email/SendGmailOAuth"
       ]
     },
     {
       "group": "Auth helpers",
       "pages": [
         "docs/api/v2/auth-token/GetUserID"
-      ]
-    },
-    {
-      "group": "Webhooks",
-      "pages": [
-        "docs/api/v2/webhooks/GcpBudgetAlert",
-        "docs/api/v2/google-risc/GoogleRISC"
       ]
     }
   ],

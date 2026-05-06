@@ -30,8 +30,6 @@ docs/
     instagram/                   # Instagram Direct
     email/                       # Email via Gmail OAuth
     auth-token/                  # Authentication helpers
-    webhooks/                    # Webhook endpoints
-    google-risc/                 # Google RISC events
 mint.json                        # Mintlify navigation/theme config
 openapi/                         # (optional) OpenAPI 3.1 spec for "Try it"
 ```
