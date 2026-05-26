@@ -1,0 +1,6 @@
+title: Velip Developers
+description: Public API & MCP documentation for the Velip platform
+theme: jekyll-theme-cayman
+markdown: kramdown
+permalink: pretty
+include: ["README.md"]

@@ -2,6 +2,8 @@
 
 All pages are Markdown; links work when browsing this repository on GitHub.
 
+> **Looking for the MCP interface?** See the [MCP server docs](../mcp/README.md) — same capabilities exposed as tools for AI clients (Cursor, Claude, etc.).
+
 ## Core
 
 | Topic | File |

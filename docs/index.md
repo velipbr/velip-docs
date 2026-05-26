@@ -1,12 +1,15 @@
+---
+layout: default
+title: Velip Developers
+---
+
 # Welcome to Velip
 
 *Multichannel communications and AI agents for contact centers — voice, SMS, WhatsApp, Messenger, Instagram, and email under a single API.*
 
 Velip is a Brazilian communications platform that powers contact centers, marketing teams, and product apps with a single backend for **voice, SMS, WhatsApp, Messenger, Instagram, and email**, plus AI agents (autonomous and real-time voice) on top of it.
 
-These docs cover what consumers of the **Velip Public API** and the **Velip MCP server** need to integrate. Internal product manuals (call center UI, agent design tools) live elsewhere.
-
-> **Published site:** [developers.velip.com.br](https://developers.velip.com.br)
+These docs cover what integrators need to connect to the **Velip Public API** and the **Velip MCP server**. Internal product manuals (call center UI, agent design tools) live elsewhere.
 
 ## What is here
 
@@ -30,11 +33,10 @@ These docs cover what consumers of the **Velip Public API** and the **Velip MCP 
 | **Destinations** | `CreateDestinationBase`, `GetDestinationsList` | Manage destination lists used by campaigns. |
 | **Auth / utilities** | `GetUserID` | Token issuance and account introspection. |
 | **Audio files** | `CreateAudioFile`, `GetAudiosList` | Upload / list audio assets used by voice campaigns. |
-| **MCP (AI agents)** | `send_sms`, `make_tts_call`, `send_whatsapp`, … | Same capabilities as MCP tools for Cursor, Claude, and custom agents. See [MCP overview](mcp/overview.md). |
+| **MCP (AI agents)** | `send_sms`, `make_tts_call`, `send_whatsapp`, … | Same capabilities exposed as MCP tools for Cursor, Claude, and custom agents. See [MCP overview](mcp/overview.md). |
 
 > **Note**
 > All REST endpoints are POST-by-default and accept `application/json` or `application/x-www-form-urlencoded`. URL parameters override JSON body keys.
-
 
 ## Conventions used in these docs
 
@@ -43,3 +45,5 @@ These docs cover what consumers of the **Velip Public API** and the **Velip MCP 
 - Examples use `curl`. Most endpoints work the same with any HTTP client.
 - Token placeholder: `YOUR_TSID` (REST) or `YOUR_TOKEN_30_CHARS` (MCP Bearer). Get one via [Authentication](api/v2/authentication.md) or your account administrator.
 - Parameters marked **required** must be sent; otherwise the endpoint returns an error code listed under each endpoint page.
+
+Also available as [introduction.md](introduction.md) for direct links from the repository.
