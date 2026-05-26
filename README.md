@@ -33,9 +33,6 @@ docs/
     instagram/
     email/
     auth-token/
-scripts/
-  convert_mdx_to_md.py         # one-off MDX → MD (reference)
-  fix_broken_doc_links.py      # repair relative links if needed
 ```
 
 ## Editing
