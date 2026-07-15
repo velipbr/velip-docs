@@ -130,7 +130,14 @@ Per-digit destinations. Each maps a key press to a follow-up content/text or to 
 
 #### `dest2` — type: *string*
 
-Number of the second leg. Special prefixes (`0800`, `300`, `400`, `103`) bypass national normalization.
+Number (or routed target) of the second leg. Special prefixes bypass national normalization and select the leg technology:
+
+| Prefix | Second leg |
+| --- | --- |
+| *(digits)* | Telephone number (PSTN). Prefixes `0800`, `300`, `400`, `103` bypass normalization. |
+| `RT<ccba_id>` | **FastVoice AI agent** — bridges the answered call to the realtime agent (`cc_bot_agent`) identified by `ccba_id`. See [FastVoice AI agent](#fastvoice-ai-agent). |
+| `WA<number>` | WhatsApp Calling second leg. |
+| `FI<queue_id>` | Contact-center PA queue. |
 
 
 #### `fifo` — type: *integer*
@@ -151,6 +158,15 @@ Digits to send after the second leg answers (for IVR-to-IVR bridging).
 #### `senddtmftime` — type: *integer*
 
 Seconds to wait after answering the second leg before sending `senddtmf`.
+
+
+## FastVoice AI agent
+
+Set `dest2=RT<ccba_id>` to have an autonomous **FastVoice** agent answer the second leg. When the callee picks up, the call is bridged to the agent (OpenAI Realtime or Gemini Live over SIP) resolved from `cc_bot_agent.ccba_project_id`, and the AI conducts the conversation end-to-end.
+
+- Use it with `type=3` (bridge on answer, no DTMF prompt), `type=2` (bridge after DTMF confirmation), or `type=100` (ASR/NLU).
+- `<ccba_id>` is the numeric id of an **active** agent owned by the account (shown as `RT<id>` in the FastVoice panel). If the agent is missing, inactive, or belongs to another account, the AI leg does not open (logged as `RT_AGENT_NOT_FOUND`) and the call proceeds without it.
+- Combine with `rec`/`startrec` to record the whole conversation and `timelimit` to cap its duration.
 
 
 ## Recording
@@ -217,6 +233,11 @@ When `sms_action=dtmf1`, the digit that triggers the SMS.
 
 
 ## Other parameters
+
+#### `free` — type: *integer*
+
+When `1`, releases the call from the Procon (do-not-call) blocklist. Defaults to the account's list policy (`livre_1`/`livre_0`) when omitted.
+
 
 #### `amd` — type: *string*
 
@@ -293,6 +314,30 @@ curl -X POST 'https://<base>/api/v2/MakeTTSCall.php' \
     "dtmfini": "42",
     "rec": 1800,
     "startrec": "ini"
+  }'
+```
+
+```bash curl (call answered by a FastVoice AI agent)
+# Places the call; when the callee answers, the second leg is bridged to the
+# FastVoice agent RT473 (dest2), which handles the conversation autonomously.
+# The whole call is recorded from the start (rec/startrec) and capped at 300s.
+curl -X POST 'https://<base>/api/v2/MakeTTSCall.php' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "tsid": "YOUR_TSID",
+    "type": "3",
+    "priority": "-1",
+    "content": "tf785432937",
+    "content1": "",
+    "content2": "",
+    "contentfail": "",
+    "rec": "300",
+    "startrec": "ini",
+    "timelimit": "300",
+    "free": "1",
+    "moh": "0",
+    "dest": "5516997998564",
+    "dest2": "RT473"
   }'
 ```
 ## Response
