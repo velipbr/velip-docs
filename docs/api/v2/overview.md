@@ -42,7 +42,7 @@ When validation or auth fails, `status` carries the error message and `status_co
 - **[Destinations](destinations/CreateDestinationBase.md)** — Manage destination lists used by campaigns.
 - **[Messenger / Instagram](messenger/MakeMessenger.md)** — Send messages on Meta channels.
 - **[Email (Gmail OAuth)](email/SendGmailOAuth.md)** — Send transactional email through customer-owned Gmail accounts.
-- **[Auth helpers](auth-token/GetUserID.md)** — Issue tokens and introspect the current account.
+- **[Auth helpers](auth-token/GetUserID.md)** — Validate credentials and introspect the current account.
 
 ## Read this first
 

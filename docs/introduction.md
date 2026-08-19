@@ -28,7 +28,7 @@ These docs cover what consumers of the **Velip Public API** and the **Velip MCP 
 | **Email** | `SendGmailOAuth` | Gmail OAuth-backed sender. |
 | **Campaigns / queues** | `CreateCampaign`, `ChangeCampaign`, `GetCampaignsList`, `CreateCenterQueue`, `GetCenterQueues` | Campaign lifecycle and contact-center queue management. |
 | **Destinations** | `CreateDestinationBase`, `GetDestinationsList` | Manage destination lists used by campaigns. |
-| **Auth / utilities** | `GetUserID` | Token issuance and account introspection. |
+| **Auth / utilities** | `GetUserID` | Credential validation and account introspection. |
 | **Audio files** | `CreateAudioFile`, `GetAudiosList` | Upload / list audio assets used by voice campaigns. |
 | **MCP (AI agents)** | `send_sms`, `make_tts_call`, `send_whatsapp`, … | Same capabilities as MCP tools for Cursor, Claude, and custom agents. See [MCP overview](mcp/overview.md). |
 

@@ -6,7 +6,7 @@ The Velip Public API v2 supports three authentication modes. Most integrations u
 
 ## 1. Token (`tsid`) — recommended
 
-A `tsid` is a long-lived API token bound to a customer account and (optionally) a user. You can obtain one through the Velip web portal or by calling [`GetUserID`](auth-token/GetUserID.md) with a valid `username` and `password`.
+A `tsid` is a long-lived API token bound to a customer account and (optionally) a user. You obtain one through the Velip web portal (integrations screen). To verify that a token is valid, call [`GetUserID`](auth-token/GetUserID.md).
 
 Once you have it, send it on every API request:
 ```bash curl (URL parameter)
@@ -25,12 +25,12 @@ curl -X POST 'https://<base>/api/v2/MakeSMS.php' \
 The server checks the token against `cd_psid` and resolves the active customer (`cdcs_id`) for the request.
 
 > **Note**
-> Tokens are 10 to 64 characters long. The first 10 characters are used as the token identifier in logs and rate-limit accounting.
+> Permanent API tokens are 30 characters long. The first 10 characters are used as the token identifier in logs and rate-limit accounting. (The former 20-character session tokens issued by `GetUserID` were retired in 2026-08.)
 
 
 ## 2. HTTP Basic
 
-Used to authenticate by `username` / `password` directly — typically only when issuing a first token via [`GetUserID`](auth-token/GetUserID.md).
+Used to authenticate by `username` / `password` directly — for example to validate credentials via [`GetUserID`](auth-token/GetUserID.md). For production traffic, prefer token authentication.
 
 ```bash
 curl -X POST 'https://<base>/api/v2/GetUserID.php' \

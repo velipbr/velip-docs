@@ -82,4 +82,4 @@ All pages are Markdown; links work when browsing this repository on GitHub.
 
 | Endpoint | File |
 | --- | --- |
-| Issue token / introspect | [auth-token/GetUserID.md](auth-token/GetUserID.md) |
+| Validate credentials / introspect | [auth-token/GetUserID.md](auth-token/GetUserID.md) |
