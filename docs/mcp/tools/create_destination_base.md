@@ -61,4 +61,4 @@ curl -X POST 'https://vox20.velip.com.br/mcpserver/velip' \
 }
 ```
 
-Use `cdlc_id` in [create_campaign](create_campaign.md) or [clone_campaign](clone_campaign.md).
+Use `cdlc_id` in [create_campaign](create_campaign.md) or [clone_campaign](clone_campaign.md). To find an existing base later, use [get_destination_bases](get_destination_bases.md).

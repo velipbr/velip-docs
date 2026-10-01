@@ -32,7 +32,7 @@ Permissions are configured by your account administrator in the Velip token mana
 | Channel | Tools |
 | --- | --- |
 | `sms` | `send_sms` |
-| `telephony` | `make_tts_call`, `get_tts_voices`, `get_call_status`, `create_destination_base`, `get_campaigns_list`, `create_campaign`, `clone_campaign`, `change_campaign` |
+| `telephony` | `make_tts_call`, `get_tts_voices`, `get_call_status`, `create_destination_base`, `get_destination_bases`, `get_campaigns_list`, `create_campaign`, `clone_campaign`, `change_campaign` |
 | `whatsapp` | `send_whatsapp`, `get_wa_templates`, `get_wa_lines` |
 | `gmail` | `send_gmail_oauth` |
 

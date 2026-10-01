@@ -7,7 +7,7 @@
 | **Permission** | `telephony` |
 | **REST equivalent** | [CreateCampaign](../../api/v2/campaigns/CreateCampaign.md) |
 
-Creates a batch voice campaign with one audio/TTS message. Provide destinations via `cdlc_id` (from [create_destination_base](create_destination_base.md)) or inline `datajson`.
+Creates a batch voice campaign with one audio/TTS message. Provide destinations via `cdlc_id` (an active base: find it by name with [get_destination_bases](get_destination_bases.md), or create one with [create_destination_base](create_destination_base.md)) or inline `datajson`.
 
 ## Required parameters
 

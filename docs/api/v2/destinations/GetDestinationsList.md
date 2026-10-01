@@ -30,7 +30,7 @@ Filter by customer-side correlation id (`cdlc_ctid`). Takes precedence over `cdl
 
 #### `search` — type: *string*
 
-Free-text search across `cdlc_nome` and `cdlc_file_name` (`LIKE %term%`). Used only when neither `ctid` nor `cdlc_id` are set.
+Free-text search across `cdlc_nome` and `cdlc_file_name` (`LIKE %term%`), ignoring case and accents. Send it in UTF-8 (ISO-8859-1 is also accepted). Used only when neither `ctid` nor `cdlc_id` are set.
 
 
 #### `list` — type: *string* — default: `1`
@@ -66,11 +66,14 @@ curl -X POST 'https://<base>/api/v2/GetDestinationsList.php' \
       "cdlc_name": "Welcome lot 2026-05",
       "cdlc_file": "destinations.csv",
       "cdlc_date": "2026-05-06",
-      "cdlc_num": 4500
+      "cdlc_num": 4500,
+      "cdlc_deleted": 0
     }
   ]
 }
 ```
+`cdlc_deleted` is `1` when the list's destinations were already purged by the retention routine. Do not reactivate such a list: it no longer has destinations to call. Note that `setactive` does not check this flag.
+
 ## Error codes
 
 | Code | `status` | Cause |

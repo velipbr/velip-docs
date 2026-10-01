@@ -25,7 +25,7 @@ The Velip MCP server exposes Velip APIs (SMS, voice, WhatsApp, email, campaigns)
 | Channel | Tools |
 | --- | --- |
 | SMS | [send_sms](tools/send_sms.md) |
-| Telephony | [make_tts_call](tools/make_tts_call.md), [get_tts_voices](tools/get_tts_voices.md), [get_call_status](tools/get_call_status.md), [create_destination_base](tools/create_destination_base.md), [get_campaigns_list](tools/get_campaigns_list.md), [create_campaign](tools/create_campaign.md), [clone_campaign](tools/clone_campaign.md), [change_campaign](tools/change_campaign.md) |
+| Telephony | [make_tts_call](tools/make_tts_call.md), [get_tts_voices](tools/get_tts_voices.md), [get_call_status](tools/get_call_status.md), [create_destination_base](tools/create_destination_base.md), [get_destination_bases](tools/get_destination_bases.md), [get_campaigns_list](tools/get_campaigns_list.md), [create_campaign](tools/create_campaign.md), [clone_campaign](tools/clone_campaign.md), [change_campaign](tools/change_campaign.md) |
 | WhatsApp | [send_whatsapp](tools/send_whatsapp.md), [get_wa_templates](tools/get_wa_templates.md), [get_wa_lines](tools/get_wa_lines.md) |
 | Gmail | [send_gmail_oauth](tools/send_gmail_oauth.md) |
 

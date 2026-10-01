@@ -16,6 +16,7 @@ All tools require `Authorization: Bearer YOUR_TOKEN_30_CHARS` and the matching [
 | [get_tts_voices](get_tts_voices.md) | `telephony` | [GetTTSVoices](../../api/v2/voice/GetTTSVoices.md) |
 | [get_call_status](get_call_status.md) | `telephony` | [GetCallStatus](../../api/v2/voice/GetCallStatus.md) |
 | [create_destination_base](create_destination_base.md) | `telephony` | [CreateDestinationBase](../../api/v2/destinations/CreateDestinationBase.md) |
+| [get_destination_bases](get_destination_bases.md) | `telephony` | [GetDestinationsList](../../api/v2/destinations/GetDestinationsList.md) |
 | [get_campaigns_list](get_campaigns_list.md) | `telephony` | [GetCampaignsList](../../api/v2/campaigns/GetCampaignsList.md) |
 | [create_campaign](create_campaign.md) | `telephony` | [CreateCampaign](../../api/v2/campaigns/CreateCampaign.md) |
 | [clone_campaign](clone_campaign.md) | `telephony` | [CreateCampaign](../../api/v2/campaigns/CreateCampaign.md) (clone mode) |
