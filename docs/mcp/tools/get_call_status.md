@@ -9,17 +9,19 @@
 
 Returns call records with status, duration, DTMF responses, and recording URLs. All filter parameters are optional. Default limit: 1000 records (newest first).
 
+For tokens without "full numbers" (all OAuth connectors), phone numbers come masked (`xxxxx` + last 3 digits, `return.numbers_masked=true`) in lists **and** in `cd_id` lookups; only a `ctid` that matches a single call returns the full number.
+
 ## Parameters
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | `cp_id` | string | No | Filter by campaign ID |
 | `cpid` | string | No | Filter by campaign external CTID |
-| `ctid` | string | No | Filter by call tracking ID |
-| `cd_id` | string | No | Single call lookup |
+| `ctid` | string | No | Filter by call tracking ID. When `ctid` is sent, `cd_id` is ignored; `ctid="null"` or a `ctid` shared by several calls is a list request |
+| `cd_id` | string | No | Single call lookup (ignored when `ctid` is given) |
 | `date_start` | string | No | Start date `YYYY-MM-DD` (use with `date_end`) |
 | `date_end` | string | No | End date `YYYY-MM-DD` |
-| `max_records` | integer | No | Max records (default 1000; `-1` = no limit) |
+| `max_records` | integer | No | Max records per page (default 1000; maximum 5000 — `-1` means the maximum) |
 | `last_id` | string | No | Pagination cursor from previous `next_id` |
 | `only_dtmf` | boolean | No | Only calls with DTMF data |
 

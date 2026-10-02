@@ -13,7 +13,8 @@ Authorization: Bearer YOUR_TOKEN_30_CHARS
 - **Length:** 30 characters total
 - **Structure:** 10-character token ID + 20-character bcrypt hash segment
 - **Storage:** table `cd_psid` in the Velip SaaS database
-- **Same family** as REST API `tsid` tokens — issued and managed from your Velip account portal
+- **Same format** as REST API `tsid` tokens — issued and managed from your Velip account portal
+- **MCP tokens are MCP-only:** a token created for the MCP Server (manual MCP token or OAuth connector) is refused by the REST API v2 when called directly (error `114`, *Token not allowed for REST API*). For direct HTTP calls, create a regular API token.
 
 To obtain a token, contact your Velip account administrator or use the token management UI in the Velip control panel.
 

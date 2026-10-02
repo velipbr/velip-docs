@@ -24,6 +24,8 @@ Token for the account.
 
 Email address that owns the OAuth grant. Must be authorized for this customer.
 
+The connection must be usable by the user who owns the token: a *Shared* connection can be used by any user of the account, while an *Individual* connection can only be used by the user who authorized it (its owner, while that user is active). An *Individual* connection of another user is treated as not found (code `210`).
+
 
 #### `to_email` — type: *string* — **required**
 
@@ -52,12 +54,12 @@ Display name for the sender (e.g., "Acme Sales").
 
 #### `cc` — type: *string*
 
-Comma-separated list of CC recipients.
+Comma-separated list of CC recipients. `cc` and `bcc` together accept at most **10** addresses (code `214`).
 
 
 #### `bcc` — type: *string*
 
-Comma-separated list of BCC recipients.
+Comma-separated list of BCC recipients. Counts toward the 10-address limit shared with `cc`.
 
 
 #### `origin` — type: *string* — default: `api_v2`
@@ -117,7 +119,12 @@ curl -X POST 'https://<base>/api/v2/SendGmailOAuth.php' \
 | `204` | `Parameter 'body' is required` | Missing `body`. |
 | `205` | `Parameter 'from_email' (authorized OAuth email) is required` | Missing `from_email`. |
 | `206` | `Invalid from_email format` | `from_email` failed `FILTER_VALIDATE_EMAIL`. |
-| `210` | (provider message) | Gmail OAuth class returned an error (token revoked, scope insufficient, send failed). |
+| `210` | (provider message) | Gmail OAuth class returned an error (token revoked, scope insufficient, send failed), or no active connection was found for `from_email` (including an *Individual* connection owned by another user). |
+| `214` | `Too many cc/bcc recipients (max 10)` | `cc` + `bcc` have more than 10 addresses (separated by `,` or `;`). Nothing is sent. |
+| `215` | `Mailbox sending quota exceeded` | The mailbox's rolling sending quota (per minute / hour / day) does not cover `1 + cc + bcc` recipients right now. Nothing is sent; retry later. |
 
 > **Note**
 > The OAuth token is refreshed automatically. If the refresh token has been revoked from the Google account, this endpoint returns code `210` with the upstream error message — re-link the account in the Velip portal to recover.
+
+> **Note**
+> Each successful send consumes `1 + cc + bcc` units of the mailbox's rolling sending quota (the same quota used by bulk email campaigns). A send rejected by the provider does not consume quota.

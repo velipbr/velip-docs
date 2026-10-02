@@ -87,22 +87,22 @@ Base64-encoded audio. Auto-decoded into the `audio` parameter when `audio` is em
 
 #### `date_start` — type: *string*
 
-Start date `YYYY-MM-DD`. Defaults to today.
+Start date, strictly `YYYY-MM-DD` and a real calendar date (other formats such as `DD/MM/YYYY` or `DD-MM-YYYY` are rejected with `220`). Defaults to today. In clone mode, omitting it starts the clone today.
 
 
 #### `date_end` — type: *string*
 
-End date `YYYY-MM-DD`. Defaults to `date_start`.
+End date, strictly `YYYY-MM-DD`. Must not be before the start date (`date_start`, or today in clone mode without `date_start`); otherwise `221` (`Invalid date end: before date start`). Defaults to `date_start`.
 
 
 #### `time_start` — type: *string*
 
-Daily start time `HH:MM:SS`. Default `00:00:00`.
+Daily start time, `HH:MM` or `HH:MM:SS` in 24-hour format (two digits each, `00:00` to `23:59:59`). Anything else (for example `9:00`, `10:30:99` or extra characters) is rejected with `222`. Default `00:00:00`.
 
 
 #### `time_end` — type: *string*
 
-Daily end time `HH:MM:SS`. Default `23:59:59`.
+Daily end time, same format as `time_start` (invalid values return `223`). Default `23:59:59`.
 
 
 #### `vel` — type: *string* — default: `max`
@@ -157,7 +157,7 @@ Group id (`cd_group.cdg_id`) for organizing the campaign in dashboards. `0` mean
 
 #### `queue_id` — type: *integer*
 
-Contact-center queue id (`cc_fila.ccf_id`) to which calls are transferred.
+Contact-center queue id (`cc_fila.ccf_id`) to which calls are transferred. Used in clone mode (`cp_id`): omitting it keeps the source campaign's queue and `0` removes it. The queue must belong to the account (a paused or inactive queue of the account is accepted); a queue of another account, or one that does not exist, returns `253`. In clone mode without `queue_id`, the queue inherited from the source campaign is refused only if it belongs to another account (a deleted queue is kept as before). Outside clone mode the parameter is ignored.
 
 
 #### `rurl` — type: *string*
@@ -320,14 +320,17 @@ In addition to [global authentication codes](../errors.md), `CreateCampaign` may
 | `205` | Uploaded file rejected (executable). |
 | `206`/`207` | `datajson` parameter or uploaded JSON file is not valid JSON. |
 | `212`–`227` | Validation errors on individual parameters (`max_answered`, `mobile`, `vel`, `resends`, `time_resends`, `cp_type`, `no_block`, `limit_name`, etc.). |
+| `220`/`221` | `date_start` / `date_end` is not a valid `YYYY-MM-DD` date, or `date_end` is before the start date (`Invalid date end: before date start`). |
+| `222`/`223` | `time_start` / `time_end` is not `HH:MM` or `HH:MM:SS` (24-hour, two digits each). |
 | `230` | Active campaign already exists with the same base, start date and start time. |
 | `231` | `cp_ativo` is not `0` or `1`. |
 | `232` | A request with the same `request_id` is still being processed (waited 60 s). Repeat the same request in about a minute. |
 | `233` | `request_id` is not 8 to 64 letters, digits or `. _ : -`. |
 | `263` | Internal error checking `request_id` (database). Nothing was created; retry later. |
-| `240`–`244` | Audio assets referenced (`content`, `contentno`, `contentfail`, `amd`, `content2..content8`) not found. |
+| `240`–`244` | Audio assets referenced (`content`, `contentno`, `contentfail`, `amd`, `content2..content8`) not found **or not available to the account**. An account can use its own audio, Velip system audio and audio of accounts in the same corporate group; audio of another account returns the same "not found" message, so the response does not reveal whether that audio exists. |
 | `250`/`251` | Group or destination list invalid. |
 | `252` | `compw` not recognized. |
+| `253` | `Queue not found` (clone mode only): `queue_id` does not exist or belongs to another account, or, without `queue_id`, the source campaign's queue belongs to another account. Nothing was created. |
 | `260` | DB error inserting the campaign model. |
 | `261` | DB error inserting the campaign row. |
 | `262` | Campaign id was not generated (parameter validation failed silently). |

@@ -16,11 +16,11 @@ Sends HTML email through a Gmail account authorized via OAuth in the Velip contr
 | `dest` | string | Yes | Recipient email |
 | `subject` | string | Yes | Subject line |
 | `body` | string | Yes | HTML body |
-| `from_email` | string | No | Sender — auto-detected if one OAuth Gmail exists |
+| `from_email` | string | No | Sender — auto-detected if one OAuth Gmail exists. Only shared connections and your own *Individual* connections can be used |
 | `from_name` | string | No | Display name |
 | `reply_to` | string | No | Reply-To address |
-| `cc` | string | No | CC address |
-| `bcc` | string | No | BCC address |
+| `cc` | string | No | CC address(es), comma-separated. Up to 10 addresses in `cc` + `bcc` together |
+| `bcc` | string | No | BCC address(es), comma-separated. Counts toward the same 10-address limit |
 
 ## Example
 

@@ -15,9 +15,10 @@ Places an outbound phone call using synthesized speech (`text`) or a pre-recorde
 | --- | --- | --- | --- |
 | `dest` | string | Yes | Destination with DDD, digits only |
 | `text` | string | Conditional | TTS text — required if `content` is empty |
-| `content` | string | Conditional | Audio/voice ID from [get_tts_voices](get_tts_voices.md) |
-| `callerid` | string | No | Caller ID shown to recipient |
+| `content` | string | Conditional | Audio/voice ID from [get_tts_voices](get_tts_voices.md). Must be an audio of your own account (or a shared Velip/corporate-group audio); otherwise the call is refused with `205 Content not found` |
 | `ctid` | string | No | External idempotency key |
+
+The caller ID comes from the account configuration and cannot be chosen through MCP.
 
 ## Example
 

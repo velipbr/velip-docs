@@ -22,12 +22,12 @@ Token for the account.
 
 #### `cd_id` — type: *string*
 
-Single call id, in the form `<cdcs_db>_<numeric>` returned by [`MakeTTSCall`](MakeTTSCall.md). When supplied, returns one record.
+Single call id, in the form `<cdcs_db>_<numeric>` returned by [`MakeTTSCall`](MakeTTSCall.md). When supplied without `ctid`, returns one record. If `ctid` is also supplied, `cd_id` is **ignored** and the request follows the `ctid` rules below.
 
 
 #### `ctid` — type: *string*
 
-Customer-side correlation id. Pass `null` to query records with empty `ctid`.
+Customer-side correlation id. Takes precedence over `cd_id`. Pass `null` to query records with empty `ctid` — this is a **list request** (rate limit, masked numbers and authorized-IP rules apply), even when `cd_id` is also sent. A `ctid` shared by more than one call is also handled as a list request; a `ctid` that matches a single call is a point lookup.
 
 
 #### `cp_id` — type: *integer*
@@ -162,16 +162,16 @@ HTTP Basic password for the webhook.
 - **`return.pagination.maxreg_capped`** (*boolean*) — Present when the requested `maxreg` (`-1` or above 5000) was reduced to the 5000 cap; `maxreg_applied` carries the page size actually used. In webhook (`rurl`) JSON mode the same `pagination` object is included in the pushed payload when the page was truncated.
 
 
-### Security: masked numbers and authorized IPs (list requests)
+### Security: masked numbers and authorized IPs
 
-To limit the damage of a leaked token, **list requests** (by period, campaign, pagination, or a `ctid` shared by more than one call) have two extra rules:
+To limit the damage of a leaked token, **list requests** (by period, campaign, pagination, `ctid=null`, or a `ctid` shared by more than one call — with or without `cd_id`) have two extra rules, and point lookups by `cd_id` share the masking rule:
 
-- **Authorized IP** — the request should come from an IP registered under Integrations > IPs. During the transition period the endpoint does not block: it adds `return.warning` to the response when the IP is not registered. Blocking (HTTP 403, `status_code: 105`) will be enabled after customers are notified.
-- **Masked numbers** — for tokens without the option **Full numbers in list responses** (Integrations > API tokens), `dest`, the `cdc_extra*` fields and `conf` come masked (`xxxxx877`, the same format the web app uses) and the response carries `return.numbers_masked: true`. Tokens created before 2026-09-03 have the option enabled; new tokens are masked by default. Point lookups by `cd_id` / single-call `ctid` always return the full number. Basic-auth (user/password) requests keep full numbers.
+- **Authorized IP** (list requests only) — the request should come from an IP registered under Integrations > IPs. During the transition period the endpoint does not block: it adds `return.warning` to the response when the IP is not registered. Blocking (HTTP 403, `status_code: 105`) will be enabled after customers are notified.
+- **Masked numbers** — for tokens without the option **Full numbers in list responses** (Integrations > API tokens), `dest`, the `cdc_extra*` fields (digit sequences of 8 or more) and, in URL-encoded webhook deliveries, `dest` / `cd_dest` / `conf` come masked (`xxxxx877`, the same format the web app uses) and the response carries `return.numbers_masked: true`. This applies to list requests **and to point lookups by `cd_id`** (call ids are sequential). Only a point lookup by a `ctid` that matches a single call returns the full number. Tokens created before 2026-09-03 have the option enabled and are not affected; new tokens are masked by default. Basic-auth (user/password) requests keep full numbers.
 
 ### Rate limit
 
-List requests (any call **without** `cd_id` or `ctid`, i.e. by period, campaign or pagination) are limited to **200 per client per hour**. Point lookups (`cd_id` / `ctid`) have a **daily cap proportional to the account's call volume**: 500 + 40 × (average calls per day over the last 30 days + calls placed today). Do not poll finished calls repeatedly; use the return URL (`rurl`) to receive the final status instead. Above either limit the endpoint answers **HTTP 429** with `status_code: 429` and a `Retry-After` header (seconds); `status` starts with `Rate limit exceeded: ...` for list requests and `Daily limit of status lookups reached ...` for point lookups (the daily cap resets at midnight). Use `cp_id` or shorter date ranges, and page with `maxreg` / `last_id` instead of re-fetching.
+List requests (by period, campaign or pagination, `ctid=null`, or a `ctid` shared by more than one call — `cd_id` is ignored whenever `ctid` is sent) are limited to **200 per client per hour**. Point lookups (`cd_id` without `ctid`, or a `ctid` that matches a single call) have a **daily cap proportional to the account's call volume**: 500 + 40 × (average calls per day over the last 30 days + calls placed today). Do not poll finished calls repeatedly; use the return URL (`rurl`) to receive the final status instead. Above either limit the endpoint answers **HTTP 429** with `status_code: 429` and a `Retry-After` header (seconds); `status` starts with `Rate limit exceeded: ...` for list requests and `Daily limit of status lookups reached ...` for point lookups (the daily cap resets at midnight). Use `cp_id` or shorter date ranges, and page with `maxreg` / `last_id` instead of re-fetching.
 
 
 ## Error codes

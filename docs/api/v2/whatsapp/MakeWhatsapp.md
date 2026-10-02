@@ -196,6 +196,7 @@ In addition to the [global authentication codes](../errors.md):
 | `233` | `No key wa` | `v8l_wa_api_key` is empty for this line. |
 | `235` | `No from wa number` | `v8l_wa_number` is empty. |
 | `236` | `No app_id` | `app_id` / `v8l_id` missing. |
+| `238` | `no credit` | Insufficient balance: the message price is reserved from the account balance before sending, and the request is refused when the balance is not above the account limit. Nothing is sent; if the provider rejects the message, the reserved amount is returned. |
 | `250` | `http duplicidade` | Duplicate within the `httpdup` window. |
 | `260` | `WA not submitted <HTTP>` | Upstream returned non-2xx HTTP code. |
 | `261+` | Provider's error code | Pass-through from Meta/Gupshup error responses (e.g., `131000`). |

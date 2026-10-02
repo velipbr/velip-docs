@@ -34,6 +34,8 @@ TTS text spoken to the callee. One of `text`, `text1..text11`, `content`, or any
 
 Audio file id from [`GetAudiosList`](../audio-files/GetAudiosList.md). Multiple slots available: `content1..content15`, plus `contentno`, `contentend`, `contentfail`, `contentdtmf`.
 
+Every audio parameter must reference an audio of your account (audios shared by Velip, such as silences, and audios of accounts in the same corporate group are also accepted). Otherwise the call is rejected with code `205`.
+
 
 #### `voice` — type: *string*
 
@@ -52,7 +54,7 @@ When `1`, normalizes Brazilian numbers; when `0`, sends as-is (international).
 
 #### `callerid` — type: *string*
 
-Override the caller id. Subject to your account's allowed caller ids; falls back to the account default when omitted.
+Caller id to present on the call. Honored only when the account has a fixed caller id (which always takes precedence over this parameter) or its own termination routes. For any other account the value is ignored: the call is still placed with the default caller id of the route, and the response carries `return.warning` = `callerid ignored: not allowed for this account`.
 
 
 #### `ctid` — type: *string*
@@ -369,6 +371,9 @@ curl -X POST 'https://<base>/api/v2/MakeTTSCall.php' \
 - **`return.cd_id`** (*string*) — Internal call id, prefixed with the customer database alias (`<cdcs_db>_<cd_id>`). Use it with [`GetCallStatus`](GetCallStatus.md) to query progress.
 
 
+- **`return.warning`** (*string*, optional) - Present when a parameter was ignored but the call was still processed. Currently: `callerid ignored: not allowed for this account` (see `callerid`).
+
+
 ## Error codes
 
 In addition to the [global authentication codes](../errors.md), `MakeTTSCall` may return:
@@ -378,6 +383,7 @@ In addition to the [global authentication codes](../errors.md), `MakeTTSCall` ma
 | `201` | `No text` | No `text*`, `content`, `nome`, or `extra*` provided. |
 | `203` | `number invalid` | `dest` could not be normalized. |
 | `204` | `Invalid content` / `Invalid content1` … | Call without `text*` and a `content`, `content1..content5` or `contentfail` that is not an audio id (letters and digits only, e.g. `tf785432937`). |
+| `205` | `Content not found` | An audio parameter references an audio that does not exist or does not belong to the account. In a call without `text*`, `content`, `content1..content5` and `contentfail` must exist; any audio parameter (`content`, `content1..content15`, `contentno`, `contentend`, `contentfail`, `contentdtmf`, `amd`) pointing to another account's audio is rejected. Audios shared by Velip (e.g. silences) and by accounts of the same corporate group are allowed. |
 | `210` | `TTS … not permitted in MakeTTSCall` | Voice provider not allowed for this endpoint (e.g., ElevenLabs). |
 | `220` | `DP` | Duplicate `ctid` for the customer (when `cdcs_uni_ctid=1`). |
 | `230` | `block ddd time` | Regional or holiday block hit. |
@@ -393,6 +399,6 @@ In addition to the [global authentication codes](../errors.md), `MakeTTSCall` ma
 ## Notes
 
 - The `cd_id` returned has the form `<cdcs_db>_<numericId>`. Pass it as-is to [`GetCallStatus`](GetCallStatus.md).
-- Audio files referenced by `content*` must already exist (`cd_wav`). They auto-renew their expiration when used; assets unused for 180 days may be purged from storage.
+- Audio files referenced by `content*` must already exist (`cd_wav`) and belong to the account (code `205` otherwise). Your own audio files auto-renew their expiration when used; assets unused for 180 days may be purged from storage.
 - For dynamic TTS, set `priority=-20` to generate audio synchronously before dialing — useful when the call must go out immediately.
 - ElevenLabs voices are blocked at this endpoint due to provider TOS. Use Google or Polly voices for `MakeTTSCall`.

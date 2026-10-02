@@ -80,6 +80,7 @@ See [Error codes](errors.md) for the full table. The most common ones in this co
 | --- | --- |
 | `100` | `fail authentication` — token invalid, account inactive, or required parameters missing. |
 | `102` | `SID not found` — `sid`/`tsid` does not exist or expired. |
+| `114` | `Token not allowed for REST API` — the token was created for the MCP Server (manual MCP token or OAuth connector) and only works through it. Use a regular API token for direct calls. |
 | `130` | No username or password supplied. |
 | `131` | Too many attempts from this IP (temporary). |
 | `132` | Too many attempts for this user (temporary). |
