@@ -14,7 +14,7 @@ Updates campaign settings. At least one field besides `cp_id` must be provided.
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | `cp_id` | string | Yes | Campaign ID to edit |
-| `cp_active` | string | No | `1` activate, `0` deactivate |
+| `cp_active` | string | No | `1` activate, `0` deactivate. A campaign whose loading failed (`cp_status_txt` starting `Falha na geração`) cannot be activated: error `234`, create it again |
 | `date_start` | string | No | New start date `YYYY-MM-DD` |
 | `date_end` | string | No | New end date |
 | `time_start` | string | No | New start time `HH:MM` |

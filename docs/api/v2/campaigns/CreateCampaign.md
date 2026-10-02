@@ -135,6 +135,11 @@ Stop after this many answered calls (`0` = no limit).
 Status after the destinations are loaded: `1` active, `0` inactive. Creation is asynchronous: the campaign stays in `cp_ativo` `2` while loading (see [GetCampaignsList](GetCampaignsList.md)). Applies to clones too; in clone mode `max_answered`, `vel`, `resends`, `time_resends`, `no_block`, `group` and `detail` override the source campaign.
 
 
+#### `request_id` — type: *string*
+
+Idempotency key (8 to 64 letters, digits or `. _ : -`). Repeating a request with the same `request_id` **and the same parameters** within 30 minutes (recognized for 30 to 60 minutes) returns the campaign already created, with `return.duplicate_request = "1"`, instead of creating another one, and does not generate a new destination list from `datajson`/upload. Use it to retry safely after a timeout or a connection error; send a new value for each new campaign. The same `request_id` with different parameters (or a different uploaded file) is a different request and creates a new campaign. Two simultaneous requests with the same key are serialized. A campaign whose loading failed (`cp_ativo` `0` with `cp_status_txt` starting `Falha na geração`) is ignored, so the retry creates a new one. Without `request_id`, behavior is unchanged.
+
+
 #### `limit_name` — type: *integer* — default: `1`
 
 Match limit per recipient name (`0`–`2`).
@@ -147,7 +152,7 @@ Match limit per recipient name (`0`–`2`).
 
 #### `group` — type: *integer*
 
-Group id (`cd_group.cdg_id`) for organizing the campaign in dashboards.
+Group id (`cd_group.cdg_id`) for organizing the campaign in dashboards. `0` means no group. In clone mode, omitting `group` keeps the source campaign's group and `0` removes it.
 
 
 #### `queue_id` — type: *integer*
@@ -302,6 +307,7 @@ curl -X POST 'https://<base>/api/v2/CreateCampaign.php' \
 ```
 - **`return.cp_id`** (*string*) — Newly created campaign id (`cd_programa.cp_id`). Use it with [`ChangeCampaign`](ChangeCampaign.md) and [`GetCampaignsList`](GetCampaignsList.md).
 - **`return.settings`** (*object*) — Values saved on the campaign: `max_answered`, `vel`, `resends`, `time_resends` (minutes), `no_block`, `group`. Check them against the request.
+- **`return.duplicate_request`** (*string*) — `"1"` only when a previous request with the same `request_id` had already created the campaign: `cp_id` is that campaign and nothing new was created.
 
 
 ## Error codes
@@ -316,6 +322,9 @@ In addition to [global authentication codes](../errors.md), `CreateCampaign` may
 | `212`–`227` | Validation errors on individual parameters (`max_answered`, `mobile`, `vel`, `resends`, `time_resends`, `cp_type`, `no_block`, `limit_name`, etc.). |
 | `230` | Active campaign already exists with the same base, start date and start time. |
 | `231` | `cp_ativo` is not `0` or `1`. |
+| `232` | A request with the same `request_id` is still being processed (waited 60 s). Repeat the same request in about a minute. |
+| `233` | `request_id` is not 8 to 64 letters, digits or `. _ : -`. |
+| `263` | Internal error checking `request_id` (database). Nothing was created; retry later. |
 | `240`–`244` | Audio assets referenced (`content`, `contentno`, `contentfail`, `amd`, `content2..content8`) not found. |
 | `250`/`251` | Group or destination list invalid. |
 | `252` | `compw` not recognized. |

@@ -42,6 +42,7 @@ Creates a batch voice campaign with one audio/TTS message. Provide destinations 
 | `resends` | Retries for unanswered: `1`–`3` |
 | `sms_text` | SMS sent after call (max 160 chars) |
 | `max_answered` | Stop after this many answered calls |
+| `group` | Group ID from [get_campaign_groups](get_campaign_groups.md); empty or `0` = no group |
 | `active` | `1` active after loading (default) or `0` created inactive |
 
 ## Asynchronous generation
@@ -51,7 +52,8 @@ Success means the campaign was accepted. Its destinations load in the background
 - The response includes `settings` (answered-call limit, speed and resends saved on the campaign) and `next_step`.
 - To confirm the load, call [get_campaigns_list](get_campaigns_list.md) with `cp_id`: `cp_active` `2` means still loading, then `1` or `0`.
 - Do not change `cp_active` while it is `2`: the loader sets the final status when it finishes.
-- Do not repeat a call that returned success: a retry can create a duplicate campaign.
+- Do not repeat a call that returned success. After a timeout or connection error, repeating the exact same call (same arguments) within 30 minutes is safe: the server sends an idempotency key built from the arguments, and the platform returns the campaign already created with `duplicate_request: true` instead of a new one. Changing any argument creates a new campaign.
+- If loading dies, after about 30 minutes the campaign shows `cp_active` `0` with `cp_status_txt` starting `Falha na geração`: it cannot be activated; create it again.
 
 See [REST CreateCampaign](../../api/v2/campaigns/CreateCampaign.md) for the full parameter list.
 

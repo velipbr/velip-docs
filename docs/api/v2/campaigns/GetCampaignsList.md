@@ -86,12 +86,19 @@ curl -X POST 'https://<base>/api/v2/GetCampaignsList.php' \
       "cp_made": 1230,
       "cp_answered": 870,
       "cp_transfered": "null",
-      "cp_model": 0
+      "cp_model": 0,
+      "cp_max_answered": "0",
+      "cp_group_id": "12",
+      "cp_status_txt": "Inseridos: 4500 destinos (2s)"
     }
   ]
 }
 ```
+- **`campaigns[].cp_active `** (*string*) — `1` active, `0` inactive, `2` still loading destinations (creation is asynchronous; see [CreateCampaign](CreateCampaign.md)).
 - **`campaigns[].cp_ontime `** (*string*) — `1` when the campaign is active **and** the current date/time is inside its schedule window.
+- **`campaigns[].cp_max_answered`** (*string*) — Answered-call limit (`0` = no limit).
+- **`campaigns[].cp_group_id`** (*string*) — Group id (`0` = no group).
+- **`campaigns[].cp_status_txt`** (*string*) — Destination loading status, e.g. `-Gerando: 20000 destinos (8s)` while loading and `Inseridos: 4500 destinos (2s)` when done. When loading died, the campaign is set to `cp_active` `0` with a text starting `Falha na geração` (after about 30 minutes without progress): nothing is dialed, it cannot be activated again ([ChangeCampaign](ChangeCampaign.md) error `234`), and a new campaign with the same list, date and time can be created.
 
 
 - **`campaigns[].cp_pas`** (*string*) — Concurrency limit for transferred calls (`cp_cdtrf_emcurso_lim`). `null` for campaigns whose model is not transfer-based.

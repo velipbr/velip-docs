@@ -119,9 +119,10 @@ curl -X POST 'https://<base>/api/v2/ChangeCampaign.php' \
 | --- | --- | --- |
 | `200` | `No cp_id` | Missing or empty `cp_id`. |
 | `210` | `No new parameters` | None of the mutable fields was supplied. |
+| `211` | `Invalid max_answered` | `max_answered` is not a whole number (up to 9 digits). |
 | `212` | `cp_id no valid` | Campaign does not belong to the customer. |
-| `212` | `Invalid max_answered` | `max_answered` is not a whole number (up to 9 digits). Same code as an invalid `cp_id`: read `status`. |
 | `230` | `Parameters without change` | UPDATE matched no row (the values were identical to the current ones). |
+| `234` | `Campaign generation failed...` | `active=1` on a campaign whose destination loading failed (`cp_status_txt` starting `Falha na geração`). It would dial a partial list or nothing: create the campaign again. |
 | `250` | `Group not found` | `group` is not an active group of the customer. |
 
 > **Note**

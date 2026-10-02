@@ -55,11 +55,12 @@ curl -X POST 'https://vox20.velip.com.br/mcpserver/velip' \
       "cp_date_start": "2026-05-01",
       "cp_date_end": "2026-05-31",
       "cp_made": "1500",
-      "cp_answered": "800"
+      "cp_answered": "800",
+      "cp_status_txt": "Inseridos: 4500 destinos (2s)"
     }
   ],
   "total": 1
 }
 ```
 
-All values are strings.
+All values are strings. `cp_active` is `2` while a new campaign is still loading destinations. `cp_status_txt` is the loading status; `cp_active` `0` with `cp_status_txt` starting `Falha na geração` means loading failed: tell the user and create the campaign again.
