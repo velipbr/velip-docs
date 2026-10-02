@@ -67,6 +67,15 @@ Campaign name.
 
 You must supply at least one mutable field besides `cp_id`; otherwise the endpoint returns code `210`.
 
+#### `max_answered` — type: *integer*
+
+Answered-call limit (`0` = no limit). When the value changes, `cp_end_send` and `cp_end_resend` are reset, like the control panel does, so a campaign that stopped at the limit dials again if the limit goes up.
+
+
+#### `group` — type: *integer*
+
+Active group of the same customer, or `0` to remove the campaign from its group.
+
 ## Request example
 ```bash curl
 curl -X POST 'https://<base>/api/v2/ChangeCampaign.php' \
@@ -111,7 +120,9 @@ curl -X POST 'https://<base>/api/v2/ChangeCampaign.php' \
 | `200` | `No cp_id` | Missing or empty `cp_id`. |
 | `210` | `No new parameters` | None of the mutable fields was supplied. |
 | `212` | `cp_id no valid` | Campaign does not belong to the customer. |
+| `213` | `Invalid max_answered` | `max_answered` is not a whole number. |
 | `230` | `Parameters without change` | UPDATE matched no row (the values were identical to the current ones). |
+| `250` | `Group not found` | `group` is not an active group of the customer. |
 
 > **Note**
 > Field keys with a trailing space (`cp_active `, `cp_group `, `cp_ontime `) are kept for backward compatibility. Don't fix the names client-side — match them exactly when parsing.

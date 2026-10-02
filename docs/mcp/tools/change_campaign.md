@@ -22,6 +22,8 @@ Updates campaign settings. At least one field besides `cp_id` must be provided.
 | `vel` | string | No | Calls per minute |
 | `cp_pas` | string | No | Transfer positions (PA count) |
 | `name` | string | No | New name (max 50 chars) |
+| `max_answered` | string | No | Answered-call limit, `0` = no limit. Changing it reopens sending, like the control panel: a campaign that stopped at the limit dials again if the limit goes up |
+| `group` | string | No | Group ID from [get_campaign_groups](get_campaign_groups.md); `0` removes the campaign from its group |
 
 ## Example — activate campaign
 

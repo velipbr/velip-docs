@@ -12,6 +12,7 @@ Each Bearer token carries an optional JSON field **`cdpsid_mcp_apis`** that cont
   "apis": {
     "sms": { "enabled": true },
     "telephony": { "enabled": true },
+    "destinations": { "enabled": true },
     "whatsapp": { "enabled": true },
     "gmail": { "enabled": true }
   }
@@ -32,9 +33,12 @@ Permissions are configured by your account administrator in the Velip token mana
 | Channel | Tools |
 | --- | --- |
 | `sms` | `send_sms` |
-| `telephony` | `make_tts_call`, `get_tts_voices`, `get_call_status`, `create_destination_base`, `get_destination_bases`, `get_campaigns_list`, `create_campaign`, `clone_campaign`, `change_campaign` |
+| `telephony` | `make_tts_call`, `get_tts_voices`, `get_call_status`, `get_campaigns_list`, `get_campaign_groups`, `create_campaign`, `clone_campaign`, `change_campaign` |
+| `destinations` | `create_destination_base`, `get_destination_bases` |
 | `whatsapp` | `send_whatsapp`, `get_wa_templates`, `get_wa_lines` |
 | `gmail` | `send_gmail_oauth` |
+
+Destination bases have their own channel because the same base feeds voice, SMS, WhatsApp and e-mail batch campaigns. To create a voice campaign from an existing base, the token needs both `destinations` (to find the base) and `telephony` (to create the campaign).
 
 ## Dynamic `tools/list`
 
@@ -55,7 +59,7 @@ This is intentional: AI agents should only discover tools they are allowed to us
 
 ```sql
 UPDATE cd_psid
-SET cdpsid_mcp_apis = '{"enabled":true,"apis":{"sms":{"enabled":true},"telephony":{"enabled":true},"whatsapp":{"enabled":true},"gmail":{"enabled":true}}}'
+SET cdpsid_mcp_apis = '{"enabled":true,"apis":{"sms":{"enabled":true},"telephony":{"enabled":true},"destinations":{"enabled":true},"whatsapp":{"enabled":true},"gmail":{"enabled":true}}}'
 WHERE cdpsid_id = YOUR_TOKEN_ID;
 ```
 

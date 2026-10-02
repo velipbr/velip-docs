@@ -127,7 +127,12 @@ Set `1` to allow mobile numbers, `0` to skip them.
 
 #### `max_answered` — type: *integer*
 
-Stop after this many answered calls.
+Stop after this many answered calls (`0` = no limit).
+
+
+#### `cp_ativo` — type: *string* — default: `1`
+
+Status after the destinations are loaded: `1` active, `0` inactive. Creation is asynchronous: the campaign stays in `cp_ativo` `2` while loading (see [GetCampaignsList](GetCampaignsList.md)). Applies to clones too; in clone mode `max_answered`, `vel`, `resends`, `time_resends`, `no_block`, `group` and `detail` override the source campaign.
 
 
 #### `limit_name` — type: *integer* — default: `1`
@@ -296,6 +301,7 @@ curl -X POST 'https://<base>/api/v2/CreateCampaign.php' \
 }
 ```
 - **`return.cp_id`** (*string*) — Newly created campaign id (`cd_programa.cp_id`). Use it with [`ChangeCampaign`](ChangeCampaign.md) and [`GetCampaignsList`](GetCampaignsList.md).
+- **`return.settings`** (*object*) — Values saved on the campaign: `max_answered`, `vel`, `resends`, `time_resends` (minutes), `no_block`, `group`. Check them against the request.
 
 
 ## Error codes
@@ -308,7 +314,8 @@ In addition to [global authentication codes](../errors.md), `CreateCampaign` may
 | `205` | Uploaded file rejected (executable). |
 | `206`/`207` | `datajson` parameter or uploaded JSON file is not valid JSON. |
 | `212`–`227` | Validation errors on individual parameters (`max_answered`, `mobile`, `vel`, `resends`, `time_resends`, `cp_type`, `no_block`, `limit_name`, etc.). |
-| `230` | Active campaign already exists with the same name + start date. |
+| `230` | Active campaign already exists with the same base, start date and start time. |
+| `231` | `cp_ativo` is not `0` or `1`. |
 | `240`–`244` | Audio assets referenced (`content`, `contentno`, `contentfail`, `amd`, `content2..content8`) not found. |
 | `250`/`251` | Group or destination list invalid. |
 | `252` | `compw` not recognized. |

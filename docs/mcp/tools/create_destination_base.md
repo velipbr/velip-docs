@@ -4,7 +4,7 @@
 
 | | |
 | --- | --- |
-| **Permission** | `telephony` |
+| **Permission** | `destinations` |
 | **REST equivalent** | [CreateDestinationBase](../../api/v2/destinations/CreateDestinationBase.md) |
 
 Imports destinations as JSON. Recommended max: 500,000 numbers per base.

@@ -14,8 +14,8 @@ Returns up to 500 campaigns (newest first) with status, schedule, and statistics
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | `max_records` | integer | No | Max campaigns (default 500) |
-| `active_only` | boolean | No | Only active campaigns (`cp_active=1`) |
-| `group_id` | string | No | Filter by group |
+| `active_only` | boolean | No | Only active campaigns (`cp_active=1`). `cp_active` is `2` while a new campaign is still loading destinations |
+| `group_id` | string | No | Filter by group ([get_campaign_groups](get_campaign_groups.md)) |
 | `date_filter` | string | No | `1` = ending today or later, or `YYYY-MM-DD` |
 | `cp_ctid` | string | No | External CTID filter |
 | `cp_id` | string | No | Single campaign ID |

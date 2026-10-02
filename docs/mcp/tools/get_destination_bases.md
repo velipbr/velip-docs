@@ -4,7 +4,7 @@
 
 | | |
 | --- | --- |
-| **Permission** | `telephony` |
+| **Permission** | `destinations` |
 | **REST equivalent** | [GetDestinationsList](../../api/v2/destinations/GetDestinationsList.md) |
 
 Returns the account's destination bases, newest first. Use it to find the `cdlc_id` of an existing base before calling [create_campaign](create_campaign.md) or [clone_campaign](clone_campaign.md). Read-only.

@@ -29,8 +29,19 @@ Clones a campaign created in the control panel (including VoiceBot, Q&A, and oth
 | Parameter | Description |
 | --- | --- |
 | `time_start`, `time_end` | Inherited from source if omitted |
-| `name`, `detail`, `group` | Override metadata |
-| `vel`, `resends`, `mobile`, `max_answered` | Dialing behaviour |
+| `name`, `group` | Override metadata; an empty `group` keeps the source campaign's group |
+| `detail` | Description. Not copied from the source campaign |
+| `vel`, `resends`, `time_resends`, `mobile`, `max_answered`, `no_block` | Dialing behaviour. Override the source campaign; check the saved values in `settings` |
+| `active` | `1` active after loading (default) or `0` created inactive |
+
+## Asynchronous generation
+
+Success means the campaign was accepted. Its destinations load in the background (seconds, or minutes for large bases), and then the campaign dials in its date/time window, unless `active` is `0`.
+
+- The response includes `settings` (answered-call limit, speed and resends saved on the campaign) and `next_step`.
+- To confirm the load, call [get_campaigns_list](get_campaigns_list.md) with `cp_id`: `cp_active` `2` means still loading, then `1` or `0`.
+- Do not change `cp_active` while it is `2`: the loader sets the final status when it finishes.
+- Do not repeat a call that returned success: a retry can create a duplicate campaign.
 
 ## Example
 
