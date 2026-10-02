@@ -26,6 +26,7 @@ Successful responses use `status: "OK"` and `status_code: "0"`.
 | --- | --- |
 | `200` | Operation succeeded. |
 | `400` | Business or validation error. The numeric `status_code` is the source of truth. |
+| `429` | Rate limit exceeded (currently only `GetCallStatus`: 200 list requests per client per hour, plus a daily cap on point lookups by `cd_id`/`ctid`). `status_code` is `429` and a `Retry-After` header (seconds) is sent. |
 | `401` | Authentication / authorization error (codes `100`–`199`). |
 
 ## Authentication and access control (1xx)

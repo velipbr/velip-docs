@@ -377,6 +377,7 @@ In addition to the [global authentication codes](../errors.md), `MakeTTSCall` ma
 | --- | --- | --- |
 | `201` | `No text` | No `text*`, `content`, `nome`, or `extra*` provided. |
 | `203` | `number invalid` | `dest` could not be normalized. |
+| `204` | `Invalid content` / `Invalid content1` … | Call without `text*` and a `content`, `content1..content5` or `contentfail` that is not an audio id (letters and digits only, e.g. `tf785432937`). |
 | `210` | `TTS … not permitted in MakeTTSCall` | Voice provider not allowed for this endpoint (e.g., ElevenLabs). |
 | `220` | `DP` | Duplicate `ctid` for the customer (when `cdcs_uni_ctid=1`). |
 | `230` | `block ddd time` | Regional or holiday block hit. |
