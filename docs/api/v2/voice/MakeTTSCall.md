@@ -94,10 +94,28 @@ Choose how the call is conducted with the `type` parameter:
 | `type` | Behaviour |
 | --- | --- |
 | `0` (default) | Plays the audio/TTS to the callee and hangs up. |
-| `2` | Asks for DTMF confirmation (`dtmfconf`) and transfers to a PA when matched. |
-| `3` | DTMF prompt without explicit confirmation; first matching digit transfers. |
+| `2` | Plays the audio/TTS, waits for the confirmation digit (`dtmfconf`) and then transfers to `dest2`. |
+| `3` | Transfers to `dest2` as soon as the callee answers, with no DTMF prompt. |
 | `22` | Plays content and records the response (use `rec=<seconds>`). |
-| `100` | Bridges directly to a configured agent (`dtmfini=<ccba_id>` is required). |
+| `100` | Call conducted by a conversational agent with ASR/NLU (`dtmfini=<ccba_id>` is required). |
+
+### Summary: `type` × `dtmfconf`
+
+`type=2` and `type=3` are the same transfer mode with or without a confirmation key. Always send them as one of these two pairs:
+
+| What you want | Send | What happens |
+| --- | --- | --- |
+| Transfer after a key press | `type=2` + `dtmfconf=<digit>` | Plays the audio/TTS and waits for the digit. Pressed: transfers to `dest2`. Not pressed: no transfer, plays `contentno` if set. |
+| Direct transfer | `type=3`, no `dtmfconf` | Transfers to `dest2` as soon as the callee answers, with no DTMF prompt. |
+
+If the pair is mismatched, `dtmfconf` wins: `type=3` with a digit runs as `type=2`, and `type=2` without a digit (or with `NO`) runs as `type=3`.
+
+In `type=100` the parameter has a different meaning:
+
+| `type` | `dtmfconf` | What happens |
+| --- | --- | --- |
+| `100` | empty | The agent listens to the callee (speech recognition on). |
+| `100` | `1` | Key-press answers for the whole call: speech recognition off, each turn waits for `dtime`. |
 
 ## DTMF / IVR
 
@@ -115,7 +133,10 @@ Seconds to wait for digits.
 
 #### `dtmfconf` — type: *string*
 
-Single digit that confirms the call (transfers to PA in `type=2`).
+Confirmation digit. Its effect depends on the call mode:
+
+- **`type=2` / `type=3`** — the digit the callee must press to be transferred to `dest2`. Sending it makes the call run as `type=2`; leaving it empty (or sending `NO`) makes it run as `type=3`, which transfers on answer without a prompt. When the digit is not pressed, the call is not transferred and `contentno` is played, if set.
+- **`type=100`** — `dtmfconf=1` switches the **whole call** to key-press answers: speech recognition stays off from the first turn to the last, and each turn waits for the digit timeout (`dtime`). Do not send it for agents that are expected to listen to the callee.
 
 
 #### `dtmfini` — type: *string*
@@ -166,7 +187,7 @@ Seconds to wait after answering the second leg before sending `senddtmf`.
 
 Set `dest2=RT<ccba_id>` to have an autonomous **FastVoice** agent answer the second leg. When the callee picks up, the call is bridged to the agent (OpenAI Realtime or Gemini Live over SIP) resolved from `cc_bot_agent.ccba_project_id`, and the AI conducts the conversation end-to-end.
 
-- Use it with `type=3` (bridge on answer, no DTMF prompt), `type=2` (bridge after DTMF confirmation), or `type=100` (ASR/NLU).
+- Use it with `type=3` (bridge on answer, no DTMF prompt, `dtmfconf` empty), `type=2` (bridge after the `dtmfconf` digit), or `type=100` (ASR/NLU).
 - `<ccba_id>` is the numeric id of an **active** agent owned by the account (shown as `RT<id>` in the FastVoice panel). If the agent is missing, inactive, or belongs to another account, the AI leg does not open (logged as `RT_AGENT_NOT_FOUND`) and the call proceeds without it.
 - Combine with `rec`/`startrec` to record the whole conversation and `timelimit` to cap its duration.
 
