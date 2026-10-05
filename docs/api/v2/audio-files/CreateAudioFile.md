@@ -63,6 +63,14 @@ Friendly name for the asset (`cd_wav.cdw_name`).
 
 Filename to use when storing the upload. Auto-detected from the data-URI / mime type when omitted. Alias `nome_up` is accepted.
 
+Rules applied to the name, in every input mode (file upload, `audio64`, raw body):
+
+- only the file name is used: any folder is dropped, and characters other than letters, digits, `.`, `-` and `_` are replaced with `_`;
+- the extension is required and must be one of `wav`, `mp3`, `mpeg`, `ogg`, `opus`, `m4a`, `mp4`, `aac`, `3gp`, `amr`, `webm` (case-insensitive; it is stored in lowercase). `wma` is not accepted;
+- any other extension is rejected with code `227` and nothing is created. In file upload and raw body, a `name_up` without extension is rejected the same way.
+
+With `audio64`, the audio type is detected from the content: a `name_up` without extension receives the detected one, and an extension different from the detected type is replaced by it.
+
 
 #### `type` — type: *string*
 
@@ -180,6 +188,7 @@ curl -X POST 'https://<base>/api/v2/CreateAudioFile.php' \
 | `223` | `size up=N` | Upload smaller than 100 bytes. |
 | `224` | `invalid base64 in audio64` | The `audio64` payload could not be decoded. |
 | `226` | `multipart discarded …` | Multipart body was discarded by PHP — usually `post_max_size` / `upload_max_filesize` exceeded. |
+| `227` | `audio file extension not allowed` | `name_up` has an extension that is not an accepted audio type, or (file upload and raw body) no extension at all. See `name_up`. Nothing was created. |
 | `281` | `Error creat audio` | The TTS server returned a non-OK response. |
 
 > **Note**
