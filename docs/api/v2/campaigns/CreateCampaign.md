@@ -75,14 +75,22 @@ TTS voice (`provider|VoiceName`).
 Audio file id used for answering-machine detection.
 
 
-#### `urlcontent` — type: *string*
+#### `urlcontent` — type: *string* — **no longer supported**
 
-Public URL to fetch an audio file from (`http`/`https`). Use as an alternative to `content`/`text`.
+Removed on 2026-10-05. The API no longer downloads audio from a URL: any request that sends `urlcontent` is rejected with code `280` and nothing is created. Use one of these instead:
+
+- send the audio in this same call with `audio64` (and, optionally, `audioname`);
+- or create the audio first with [CreateAudioFile](../audio-files/CreateAudioFile.md) and send the returned `cdw_file` in `content`.
 
 
 #### `audio64` — type: *string*
 
-Base64-encoded audio. Auto-decoded into the `audio` parameter when `audio` is empty.
+Base64-encoded audio. Auto-decoded into the `audio` parameter when `audio` is empty. The content must be an audio file; anything else is rejected with code `283`.
+
+
+#### `audioname` — type: *string*
+
+Optional file name for the audio sent in `audio` / `audio64` (for example `greeting.mp3`). Only the file name is used: folders are dropped and characters other than letters, digits, `.`, `-` and `_` are replaced with `_`. Accepted extensions: `wav`, `mp3`, `mpeg`, `ogg`, `opus`, `m4a`, `mp4`, `aac`, `3gp`, `amr`, `webm`. When the name is missing or has another extension, the type is detected from the audio content.
 
 
 #### `date_start` — type: *string*
@@ -335,7 +343,9 @@ In addition to [global authentication codes](../errors.md), `CreateCampaign` may
 | `261` | DB error inserting the campaign row. |
 | `262` | Campaign id was not generated (parameter validation failed silently). |
 | `270`–`275` | Failure generating the destination list from inline data (`datacsv`/`datajson`). |
-| `280`/`281` | TTS or audio-URL fetch failed. |
+| `280` | `urlcontent` was sent. Audio by URL is no longer supported: send the audio in `audio64`, or create it with [CreateAudioFile](../audio-files/CreateAudioFile.md) and send the returned `cdw_file` in `content`. Nothing was created. |
+| `281` | Audio generation failed (TTS or conversion of the audio sent in `audio` / `audio64`). |
+| `283` | `audio file type not recognized`: the content sent in `audio` / `audio64` is not a supported audio file. The campaign is not created. |
 | `282` | Source `cp_id` (clone) does not belong to the customer. |
 | `290`/`291` | `nans` / `nans2` out of bounds. |
 | `300`–`305` | SMS follow-up parameters invalid. |
