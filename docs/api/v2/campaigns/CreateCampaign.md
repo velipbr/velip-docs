@@ -9,7 +9,7 @@ Creates a voice campaign that batch-dials a destination list (`cd_lista_cadastro
 
 - `0` (default) — **Simple TTS / audio playback**.
 - `4` — **Q&A IVR** (collects DTMF digits with branched audio per digit).
-- `6` — **Confirmation + validation** (callee confirms identity by entering a digit-coded value).
+- `6` — **Confirmation + validation** (callee answers with a key and, optionally, types a value that is validated against the destination list).
 - Cloning from another campaign (`cp_id`) reuses an existing model and just changes scheduling / list.
 
 The endpoint can also generate the destination list and the audio assets in a single call by accepting CSV/JSON content and TTS text.
@@ -62,12 +62,12 @@ Existing audio file id (`cd_wav.cdw_file`) for the main message.
 
 #### `text` — type: *string*
 
-TTS text — when supplied, the endpoint generates the audio internally and uses it instead of `content`.
+TTS text — when supplied, the endpoint generates the audio internally and uses it instead of `content`. Only for simple campaigns (`cp_type` empty or `0`): the other types do not generate audio and need `content`.
 
 
 #### `voice` — type: *string*
 
-TTS voice (`provider|VoiceName`).
+TTS voice (`provider|VoiceName`). ElevenLabs is not allowed in this endpoint (code `210`).
 
 
 #### `amd` — type: *string*
@@ -85,7 +85,7 @@ Removed on 2026-10-05. The API no longer downloads audio from a URL: any request
 
 #### `audio64` — type: *string*
 
-Base64-encoded audio. Auto-decoded into the `audio` parameter when `audio` is empty. The content must be an audio file; anything else is rejected with code `283`.
+Base64-encoded audio. Auto-decoded into the `audio` parameter when `audio` is empty. The content must be an audio file; anything else is rejected with code `283`. Only for simple campaigns (`cp_type` empty or `0`).
 
 
 #### `audioname` — type: *string*
@@ -118,9 +118,9 @@ Daily end time, same format as `time_start` (invalid values return `223`). Defau
 Maximum calls per minute. Either an integer (`1`–`100`) or `max` to use the customer's full channel allocation.
 
 
-#### `resends` — type: *integer* — default: `0`
+#### `resends` — type: *integer* — default: `1`
 
-Number of retries when calls fail. Total attempts = `resends + 1`. Hard cap is `3` retries.
+Number of retries when calls fail: `0` (no retry) to `3`. Total attempts = `resends + 1`. When omitted, one retry is made.
 
 
 #### `time_resends` — type: *integer* — default: `30`
@@ -150,7 +150,7 @@ Idempotency key (8 to 64 letters, digits or `. _ : -`). Repeating a request with
 
 #### `limit_name` — type: *integer* — default: `1`
 
-Match limit per recipient name (`0`–`2`).
+How much of the destination's name is spoken in the `NOME` variable: `0` full name, `1` first name only, `2` first and second name.
 
 
 #### `no_block` — type: *integer*
@@ -170,7 +170,7 @@ Contact-center queue id (`cc_fila.ccf_id`) to which calls are transferred. Used 
 
 #### `rurl` — type: *string*
 
-Custom callback URL for status updates.
+Custom callback URL for status updates. It must be a complete URL (with scheme) pointing to a public address: an invalid URL or an internal address is rejected with code `208` and nothing is created.
 
 
 #### `tfix` — type: *string*
@@ -191,11 +191,6 @@ Trigger an SMS follow-up. One of `ok`, `nae`, `oknae`, `dtmf1`. Only with `cp_ty
 #### `sms_text` — type: *string*
 
 SMS body when `sms_action` is set. Max 160 chars (accents stripped).
-
-
-#### `cp_ativo` — type: *integer*
-
-`1` activates the campaign immediately, `0` keeps it paused.
 
 
 ### Q&A campaign (`cp_type=4`) — extra parameters
@@ -227,29 +222,76 @@ Seconds to wait for digits (`4`–`15`).
 
 ### Confirmation+validation (`cp_type=6`) — extra parameters
 
-#### `content2..content8` — type: *string*
+The call plays `content` (the question) and waits for one key. A confirming key leads to `content4`, or to the validation step when `ndigval` is set. This type needs `content`: `text` and `audio64` are not converted.
 
-Branch audios (success, failure, follow-up prompts).
+#### `dtmfini` — type: *string*
+
+Keys that confirm, separated by `|` (for example `1` or `1|2`). Send it: when omitted, the call skips the question and the confirmation key.
+
+
+#### `dtmf2` — type: *string* — default: `NO`
+
+`NO`, or the key that repeats the question after `content6`. Add `|<digit>` to define a refusal key (for example `NO|9`). The refusal key is checked before `dtmfini`, so it must not be one of the confirming keys.
+
+
+#### `nans` — type: *integer* — default: `1`
+
+How many times the question is asked again after a key that is not accepted (`1`–`3`).
+
+
+#### `content4` — type: *string*
+
+Audio played after a confirming key, or after the value is validated when `ndigval` is set. The call then ends.
+
+
+#### `content8` — type: *string*
+
+Audio played when no key is pressed. The call then waits for a key one more time.
+
+
+#### `contentno` — type: *string*
+
+Audio played before hanging up when no key is pressed at all.
 
 
 #### `contentfail` — type: *string*
 
-Audio played when validation fails.
+Audio played before hanging up when the callee presses the refusal key or runs out of attempts with keys that are not accepted.
 
 
-#### `ndigval` — type: *string*
+#### `content2` — type: *string*
 
-Number of digits expected for validation.
+Audio used to ask the question again after a key that is not accepted.
 
 
-#### `dtmf2, fdtmf` — type: *string*
+#### `content6` — type: *string*
 
-Per-digit DTMF rules and filter rule (`fdtmf=<column>|<value>`).
+Used only when `dtmf2` defines a repeat key: audio played after a key that is not accepted; the call then waits for a key again.
+
+
+#### `ndigval` — type: *string* — default: `NO`
+
+Number of digits of the value the callee must type to be validated, after the confirming key. `NO` means no validation.
 
 
 #### `compw` — type: *string*
 
-Column used to validate the digits typed by the callee. One of `cod_cli`, `extra1`, `extra2`, `extra3`.
+Column used to validate the digits typed by the callee. One of `cod_cli`, `extra1`, `extra2`, `extra3`. The digits typed are compared with the first `ndigval` digits of that column (other characters in the column are ignored).
+
+
+#### `content5, content7, content3` — type: *string*
+
+Validation audios: `content5` asks for the value, `content7` asks again after a wrong value, and `content3` is played before hanging up when validation fails.
+
+
+#### `nans2` — type: *integer* — default: `1`
+
+How many times the value is asked again after a wrong one (`1`–`3`).
+
+
+#### `fdtmf` — type: *string*
+
+Optional key filter in the form `<key>|<seconds>`. Both parts are required and `<seconds>` must be greater than `0`; otherwise `219`.
 
 
 ### Inline list
@@ -314,7 +356,7 @@ curl -X POST 'https://<base>/api/v2/CreateCampaign.php' \
 }
 ```
 - **`return.cp_id`** (*string*) — Newly created campaign id (`cd_programa.cp_id`). Use it with [`ChangeCampaign`](ChangeCampaign.md) and [`GetCampaignsList`](GetCampaignsList.md).
-- **`return.settings`** (*object*) — Values saved on the campaign: `max_answered`, `vel`, `resends`, `time_resends` (minutes), `no_block`, `group`. Check them against the request.
+- **`return.settings`** (*object*) — Values saved on the campaign: `max_answered`, `vel`, `resends`, `time_resends` (minutes), `no_block`, `group`, `mobile`. Check them against the request.
 - **`return.duplicate_request`** (*string*) — `"1"` only when a previous request with the same `request_id` had already created the campaign: `cp_id` is that campaign and nothing new was created.
 
 
@@ -327,6 +369,8 @@ In addition to [global authentication codes](../errors.md), `CreateCampaign` may
 | `200` | FTP profile (`relftp`) does not exist. |
 | `205` | Uploaded file rejected (executable). |
 | `206`/`207` | `datajson` parameter or uploaded JSON file is not valid JSON. |
+| `208` | `rurl` is not a valid URL or points to an internal address. Nothing was created. |
+| `210` | TTS provider not permitted in this endpoint (ElevenLabs). |
 | `212`–`227` | Validation errors on individual parameters (`max_answered`, `mobile`, `vel`, `resends`, `time_resends`, `cp_type`, `no_block`, `limit_name`, etc.). |
 | `220`/`221` | `date_start` / `date_end` is not a valid `YYYY-MM-DD` date, or `date_end` is before the start date (`Invalid date end: before date start`). |
 | `222`/`223` | `time_start` / `time_end` is not `HH:MM` or `HH:MM:SS` (24-hour, two digits each). |
@@ -347,7 +391,7 @@ In addition to [global authentication codes](../errors.md), `CreateCampaign` may
 | `281` | Audio generation failed (TTS or conversion of the audio sent in `audio` / `audio64`). |
 | `283` | `audio file type not recognized`: the content sent in `audio` / `audio64` is not a supported audio file. The campaign is not created. |
 | `282` | Source `cp_id` (clone) does not belong to the customer. |
-| `290`/`291` | `nans` / `nans2` out of bounds. |
+| `290`/`291` | `cp_type=6`: `nans` / `nans2` out of bounds. `cp_type=4`: `290` is `nans` and `291` is `dtime` out of bounds. |
 | `300`–`305` | SMS follow-up parameters invalid. |
 
 > **Note**

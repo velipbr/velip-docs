@@ -96,6 +96,7 @@ Choose how the call is conducted with the `type` parameter:
 | `0` (default) | Plays the audio/TTS to the callee and hangs up. |
 | `2` | Plays the audio/TTS, waits for the confirmation digit (`dtmfconf`) and then transfers to `dest2`. |
 | `3` | Transfers to `dest2` as soon as the callee answers, with no DTMF prompt. |
+| `6` | Confirmation: plays a question, waits for one key and plays a closing audio. See [Confirmation call](#confirmation-call-type6). |
 | `22` | Plays content and records the response (use `rec=<seconds>`). |
 | `100` | Call conducted by a conversational agent with ASR/NLU (`dtmfini=<ccba_id>` is required). |
 
@@ -116,6 +117,36 @@ In `type=100` the parameter has a different meaning:
 | --- | --- | --- |
 | `100` | empty | The agent listens to the callee (speech recognition on). |
 | `100` | `1` | Key-press answers for the whole call: speech recognition off, each turn waits for `dtime`. |
+
+### Confirmation call (`type=6`)
+
+The call plays a question, waits for one key and ends with an audio chosen by the answer.
+
+| Parameter | Role in `type=6` |
+| --- | --- |
+| `content` or `text` | The question. |
+| `dtmfini` | Keys accepted as an answer: digits `0`–`9` separated by `\|` (for example `1\|2`). The request is not rejected without it, but then no key is accepted. Do not send `NO`: the question is skipped and the call goes straight to `content4`. |
+| `content4` | Audio played after an accepted key. The call then ends. |
+| `content8` | Audio played when no key is pressed. The call then waits for a key one more time. |
+| `contentno` | Audio played before hanging up when no key is pressed at all. |
+| `contentfail` | Audio played before hanging up when the callee presses the refusal key or a key that is not accepted. |
+| `dtmf2` | Send `NO`, or `NO\|<digit>` to define a refusal key (for example `NO\|9`). The refusal key is checked before `dtmfini`, so it must not be one of the accepted keys. If `dtmf2` is omitted, after a key that is not accepted the call stays silent for up to `dtime` seconds waiting for another key before playing `contentfail`. |
+| `dtmf` | Leave it empty or send `NO` (uppercase). Any other value turns on a typed-value validation step that only works in campaigns ([`CreateCampaign`](../campaigns/CreateCampaign.md), `cp_type=6`): in a single call it always fails, `content4` is not played and `resp_1` comes back as `#`. |
+| `dtime` | Seconds to wait for the key. Default `7`. |
+| `nans`, `dtmf4` | Optional repetition: `dtmf4` is a key that replays the question and `nans` is how many repetitions are allowed. With `nans`, a key that is not accepted also makes the call play `content2` and wait again before `contentfail`. Leave both out for a call that ends on the first answer. |
+
+What happens for each answer, with `dtmf2` starting with `NO` and without `nans`:
+
+| Callee | Call |
+| --- | --- |
+| Presses a key listed in `dtmfini` | Plays `content4` and hangs up. |
+| Presses the refusal key | Plays `contentfail`, if set, and hangs up. |
+| Presses another key | Plays `contentfail`, if set, and hangs up. |
+| Presses nothing | If `content8` is set, plays it and waits once more: accepted and refusal keys work as in the first wait, and any other key ends the call with `contentfail`. Without `content8`, or with no key again, plays `contentno`, if set, and hangs up. |
+
+`resp_1`, returned by [`GetCallStatus`](GetCallStatus.md), holds the key the callee pressed: an accepted key, the refusal key or, in the first wait, any other key. It is empty when no key was pressed. Compare it with your accepted keys to know whether the callee confirmed.
+
+The key can be pressed while the question is still playing.
 
 ## DTMF / IVR
 
@@ -141,7 +172,7 @@ Confirmation digit. Its effect depends on the call mode:
 
 #### `dtmfini` — type: *string*
 
-Initial DTMF mapping. For `type=100`, this is the `ccba_id` of the agent to bridge to.
+Initial DTMF mapping. For `type=100`, this is the `ccba_id` of the agent to bridge to. For `type=6`, the keys accepted as an answer, separated by `|`.
 
 
 #### `dtmf, dtmf2..dtmf11` — type: *string*
@@ -274,7 +305,7 @@ Music-on-hold mode: `1` = dial tone, `2` = default music, `3` = silence.
 
 #### `rurl` — type: *string*
 
-URL-encoded callback URL for status updates (overrides the per-account default).
+URL-encoded callback URL for status updates (overrides the per-account default). It must be a complete URL (with scheme) pointing to a public address: an invalid URL or an internal address is rejected with code `208` and the call is not placed.
 
 
 #### `numlim` — type: *integer*
@@ -324,6 +355,22 @@ curl -X POST 'https://<base>/api/v2/MakeTTSCall.php' \
     "dtmfconf": "1",
     "dest2": "08001234567",
     "fifo": 60
+  }'
+```
+
+```bash curl (confirmation)
+# Plays the question tf12345 and waits for 1 or 2; then plays tf12346 and hangs up.
+curl -X POST 'https://<base>/api/v2/MakeTTSCall.php' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "tsid": "YOUR_TSID",
+    "dest": "5511999999999",
+    "type": "6",
+    "content": "tf12345",
+    "dtmfini": "1|2",
+    "content4": "tf12346",
+    "dtmf": "NO",
+    "dtmf2": "NO"
   }'
 ```
 
@@ -405,6 +452,7 @@ In addition to the [global authentication codes](../errors.md), `MakeTTSCall` ma
 | `203` | `number invalid` | `dest` could not be normalized. |
 | `204` | `Invalid content` / `Invalid content1` … | Call without `text*` and a `content`, `content1..content5` or `contentfail` that is not an audio id (letters and digits only, e.g. `tf785432937`). |
 | `205` | `Content not found` | An audio parameter references an audio that does not exist or does not belong to the account. In a call without `text*`, `content`, `content1..content5` and `contentfail` must exist; any audio parameter (`content`, `content1..content15`, `contentno`, `contentend`, `contentfail`, `contentdtmf`, `amd`) pointing to another account's audio is rejected. Audios shared by Velip (e.g. silences) and by accounts of the same corporate group are allowed. |
+| `208` | `Invalid rurl: …` | `rurl` is not a valid URL or points to an internal address. |
 | `210` | `TTS … not permitted in MakeTTSCall` | Voice provider not allowed for this endpoint (e.g., ElevenLabs). |
 | `220` | `DP` | Duplicate `ctid` for the customer (when `cdcs_uni_ctid=1`). |
 | `230` | `block ddd time` | Regional or holiday block hit. |

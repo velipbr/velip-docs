@@ -39,7 +39,7 @@ Creates a batch voice campaign with one audio/TTS message. Provide destinations 
 | `name` | Campaign name (max 50 chars) |
 | `detail` | Description (max 256 chars) |
 | `vel` | Calls per minute: `1`–`100` or `max` |
-| `resends` | Retries for unanswered: `1`–`3` |
+| `resends` | Retries for unanswered: `0` (no retry) to `3`. Default `1` |
 | `sms_text` | SMS sent after call (max 160 chars) |
 | `max_answered` | Stop after this many answered calls |
 | `group` | Group ID from [get_campaign_groups](get_campaign_groups.md); empty or `0` = no group |
