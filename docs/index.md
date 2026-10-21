@@ -13,6 +13,7 @@ These docs cover what integrators need to connect to the **Velip Public API** an
 
 ## What is here
 
+- **[Build your integration with an AI agent](ai-integration/README.md)** — let ChatGPT, Claude or Cursor read these docs and your CRM docs and write the integration, with an example prompt.
 - **[API v2 index](api/v2/README.md)** — table of contents for every documented endpoint.
 - **[MCP server index](mcp/README.md)** — connect AI clients (Cursor, Claude) to Velip tools.
 - **[API v2 overview](api/v2/overview.md)** — conventions and response shape.

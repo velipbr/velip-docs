@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" width="1200" height="620" role="img" aria-labelledby="t d">
+  <title id="t">AI-assisted integration with Velip</title>
+  <desc id="d">An AI agent such as ChatGPT, Claude, Claude Code or Cursor reads the Velip API docs and the CRM docs, then writes the integration code or a step-by-step guide. After that, a CRM event calls a webhook, the webhook calls the Velip MakeTTSCall API, the customer gets a phone call, and the call result goes back to the CRM through rurl.</desc>
+  <defs>
+    <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5338F7"/>
+    </marker>
+    <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8A88A0"/>
+    </marker>
+    <marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#F94C07"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+      .mono { font-family: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+      .h1 { font-size: 24px; font-weight: 700; fill: #1B1B1B; }
+      .lead { font-size: 15px; fill: #55536A; }
+      .sec { font-size: 12px; font-weight: 700; letter-spacing: 1.2px; fill: #5338F7; }
+      .ct { font-size: 16px; font-weight: 700; fill: #1B1B1B; }
+      .cs { font-size: 13px; fill: #55536A; }
+      .cm { font-size: 12px; fill: #5338F7; }
+      .bt { font-size: 15px; font-weight: 700; fill: #1B1B1B; }
+      .bs { font-size: 12px; fill: #55536A; }
+    </style>
+  </defs>
+
+  <rect x="0.5" y="0.5" width="1199" height="619" rx="20" fill="#FAFAFE" stroke="#E4E2F3"/>
+
+  <text x="40" y="52" class="h1">Build your Velip integration with an AI agent</text>
+  <text x="40" y="80" class="lead">The agent reads the Velip docs and your CRM docs, then writes the integration or gives you a step-by-step guide.</text>
+
+  <!-- 1 · agent reads and builds -->
+  <text x="40" y="122" class="sec">1 · THE AGENT READS BOTH DOCS AND BUILDS</text>
+
+  <!-- Velip docs -->
+  <rect x="40" y="140" width="280" height="110" rx="12" fill="#FFFFFF" stroke="#CDCAEC"/>
+  <path d="M60,160 h26 l10,10 v34 h-36 z" fill="#EEEBFF" stroke="#5338F7" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M86,160 v10 h10" fill="none" stroke="#5338F7" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M67,182 h22 M67,189 h22 M67,196 h14" stroke="#5338F7" stroke-width="1.5" stroke-linecap="round"/>
+  <text x="112" y="178" class="ct">Velip API docs</text>
+  <text x="112" y="199" class="cs">velip-docs on GitHub</text>
+  <text x="112" y="224" class="mono cm">MakeTTSCall · tsid · rurl</text>
+
+  <!-- CRM docs -->
+  <rect x="40" y="270" width="280" height="110" rx="12" fill="#FFFFFF" stroke="#CDCAEC"/>
+  <path d="M60,290 h26 l10,10 v34 h-36 z" fill="#FFF0EA" stroke="#F94C07" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M86,290 v10 h10" fill="none" stroke="#F94C07" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M67,312 h22 M67,319 h22 M67,326 h14" stroke="#F94C07" stroke-width="1.5" stroke-linecap="round"/>
+  <text x="112" y="308" class="ct">Your CRM docs</text>
+  <text x="112" y="329" class="cs">API and webhook docs</text>
+  <text x="112" y="354" class="mono cm" style="fill:#C23A04">events · fields · auth</text>
+
+  <!-- arrows into the agent -->
+  <path d="M322,195 C372,195 372,232 416,232" fill="none" stroke="#5338F7" stroke-width="2" marker-end="url(#ap)"/>
+  <path d="M322,325 C372,325 372,288 416,288" fill="none" stroke="#5338F7" stroke-width="2" marker-end="url(#ap)"/>
+
+  <!-- agent -->
+  <rect x="420" y="140" width="360" height="240" rx="16" fill="#1B1B1B"/>
+  <circle cx="456" cy="176" r="18" fill="#5338F7"/>
+  <path d="M456,164 Q458,174 468,176 Q458,178 456,188 Q454,178 444,176 Q454,174 456,164 z" fill="#FFFFFF"/>
+  <text x="484" y="172" style="font-size:17px;font-weight:700;fill:#FFFFFF">AI agent</text>
+  <text x="484" y="192" style="font-size:12px;fill:#CDCAEC">ChatGPT · Claude · Claude Code · Cursor</text>
+  <rect x="440" y="212" width="320" height="94" rx="10" fill="#2A2933" stroke="#3B3A4A"/>
+  <text x="456" y="238" class="mono" style="font-size:13px;fill:#F94C07">&gt;</text>
+  <text x="472" y="238" style="font-size:13px;fill:#F2F2F7">Read the Velip docs and my CRM</text>
+  <text x="472" y="260" style="font-size:13px;fill:#F2F2F7">docs. When a new lead comes in,</text>
+  <text x="472" y="282" style="font-size:13px;fill:#F2F2F7">place a call with MakeTTSCall.</text>
+  <rect x="440" y="324" width="134" height="28" rx="14" fill="#2F2A5C"/>
+  <text x="507" y="343" text-anchor="middle" style="font-size:12px;fill:#CDCAEC">✓ reads both docs</text>
+  <rect x="584" y="324" width="140" height="28" rx="14" fill="#2F2A5C"/>
+  <text x="654" y="343" text-anchor="middle" style="font-size:12px;fill:#CDCAEC">✓ maps CRM fields</text>
+
+  <!-- arrows out of the agent -->
+  <path d="M782,232 C832,232 832,195 876,195" fill="none" stroke="#5338F7" stroke-width="2" marker-end="url(#ap)"/>
+  <path d="M782,288 C832,288 832,325 876,325" fill="none" stroke="#5338F7" stroke-width="2" marker-end="url(#ap)"/>
+
+  <!-- output: code -->
+  <rect x="880" y="140" width="280" height="110" rx="12" fill="#FFFFFF" stroke="#CDCAEC"/>
+  <rect x="900" y="162" width="38" height="38" rx="8" fill="#EEEBFF" stroke="#5338F7" stroke-width="1.5"/>
+  <text x="919" y="186" text-anchor="middle" class="mono" style="font-size:13px;font-weight:700;fill:#5338F7">&lt;/&gt;</text>
+  <text x="954" y="178" class="ct">Integration code</text>
+  <text x="954" y="199" class="cs">webhook or small middleware</text>
+  <text x="954" y="224" class="mono cm">POST MakeTTSCall.php</text>
+
+  <text x="1020" y="265" text-anchor="middle" style="font-size:12px;font-weight:700;fill:#8A88A0">or</text>
+
+  <!-- output: guide -->
+  <rect x="880" y="270" width="280" height="110" rx="12" fill="#FFFFFF" stroke="#CDCAEC"/>
+  <rect x="900" y="292" width="38" height="38" rx="8" fill="#FFF0EA" stroke="#F94C07" stroke-width="1.5"/>
+  <path d="M907,303 l3,3 l5,-6 M907,315 l3,3 l5,-6" fill="none" stroke="#F94C07" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M920,304 h11 M920,316 h11" stroke="#F94C07" stroke-width="1.8" stroke-linecap="round"/>
+  <text x="954" y="308" class="ct">Step-by-step guide</text>
+  <text x="954" y="329" class="cs">to set it up yourself</text>
+  <text x="954" y="354" class="bs">token → webhook → test call</text>
+
+  <!-- 2 · what runs after -->
+  <text x="40" y="432" class="sec">2 · WHAT THE INTEGRATION DOES AFTERWARDS</text>
+
+  <rect x="40" y="452" width="184" height="60" rx="12" fill="#FFFFFF" stroke="#CDCAEC"/>
+  <text x="132" y="477" text-anchor="middle" class="bt">CRM event</text>
+  <text x="132" y="498" text-anchor="middle" class="bs">e.g. a new lead</text>
+
+  <rect x="274" y="452" width="184" height="60" rx="12" fill="#FFFFFF" stroke="#CDCAEC"/>
+  <text x="366" y="477" text-anchor="middle" class="bt">Webhook</text>
+  <text x="366" y="498" text-anchor="middle" class="bs">CRM → your code</text>
+
+  <rect x="508" y="452" width="184" height="60" rx="12" fill="#5338F7"/>
+  <text x="600" y="477" text-anchor="middle" style="font-size:15px;font-weight:700;fill:#FFFFFF">Velip API</text>
+  <text x="600" y="498" text-anchor="middle" class="mono" style="font-size:12px;fill:#E6E3FF">MakeTTSCall</text>
+
+  <rect x="742" y="452" width="184" height="60" rx="12" fill="#FFFFFF" stroke="#CDCAEC"/>
+  <text x="834" y="477" text-anchor="middle" class="bt">Phone call</text>
+  <text x="834" y="498" text-anchor="middle" class="bs">voice · TTS · IVR</text>
+
+  <rect x="976" y="452" width="184" height="60" rx="12" fill="#FFF0EA" stroke="#F94C07"/>
+  <text x="1068" y="477" text-anchor="middle" class="bt">Call result</text>
+  <text x="1068" y="498" text-anchor="middle" class="bs">sent to your rurl</text>
+
+  <path d="M226,482 H270" stroke="#8A88A0" stroke-width="2" marker-end="url(#ag)"/>
+  <path d="M460,482 H504" stroke="#8A88A0" stroke-width="2" marker-end="url(#ag)"/>
+  <path d="M694,482 H738" stroke="#8A88A0" stroke-width="2" marker-end="url(#ag)"/>
+  <path d="M928,482 H972" stroke="#8A88A0" stroke-width="2" marker-end="url(#ag)"/>
+
+  <path d="M1068,514 V550 Q1068,564 1054,564 H146 Q132,564 132,550 V518" fill="none" stroke="#F94C07" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#ao)"/>
+  <text x="600" y="590" text-anchor="middle" style="font-size:13px;fill:#C23A04">the call result updates the lead in the CRM</text>
+</svg>

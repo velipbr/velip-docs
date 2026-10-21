@@ -12,6 +12,7 @@ This repository is written in **plain Markdown** so it reads well on [GitHub](ht
 
 - **API v2 manual** — every public endpoint under `https://<base>/api/v2/*.php`: parameters, examples, responses, and endpoint-specific error codes.
 - **MCP server** — connect AI clients (Cursor, Claude) to Velip tools via MCP Streamable HTTP.
+- **[Build your integration with an AI agent](docs/ai-integration/README.md)** — let ChatGPT, Claude or Cursor read these docs and your CRM docs and write the integration, with an example prompt.
 - **Cross-cutting guides** — [authentication](docs/api/v2/authentication.md), [error codes](docs/api/v2/errors.md), [rate limits](docs/api/v2/rate-limits.md), [getting started](docs/api/v2/getting-started.md).
 
 ## Layout
@@ -20,6 +21,7 @@ This repository is written in **plain Markdown** so it reads well on [GitHub](ht
 docs/
   index.md                     # landing (GitHub Pages home)
   introduction.md              # overview for integrators
+  ai-integration/              # build the integration with an AI agent (prompt + diagram)
   DEPLOY.md                    # GitHub Pages + DNS setup
   api/v2/
     README.md                  # index of all v2 pages
