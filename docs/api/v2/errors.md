@@ -54,6 +54,7 @@ These come from individual endpoints. The exact set of codes varies — see each
 | --- | --- | --- |
 | `201` | `No text` | Voice / TTS call without any text/content provided. |
 | `203` | `number invalid` | Destination number could not be normalized. |
+| `209` | `Voice not found` / `template_not_found` | TTS endpoints (`MakeTTSCall`, `CreateCampaign`, `CreateAudioFile`): `voice` is not one of the voices returned by `GetTTSVoices` for the account. In `SendEmailOAuth` the same code means the e-mail template was not found. |
 | `210` | `TTS provider not permitted` | The selected voice maps to a provider blocked for this operation. |
 | `220` | `No sms account` / `Duplicate ctid` | Account not provisioned for the channel, or duplicate `ctid` when uniqueness is enforced. |
 | `230` | `No dest` / `block ddd time` | Destination missing, or a regional/holiday block was hit. |
@@ -76,6 +77,7 @@ These come from individual endpoints. The exact set of codes varies — see each
 | `302` | `Sms no text` | `MakeTTSCall` requested SMS follow-up without `sms_text`. |
 | `304` | `Invalid sms_action` | `sms_action` is not one of `ok`, `nae`, `oknae`, `dtmf1`. |
 | `305` | `Sms text 160 characters` | SMS follow-up text longer than 160 characters. |
+| `500` | `internal error` | Temporary failure on the Velip side (for example, the database could not be read). Nothing was created; repeat the same request later. |
 
 > **Note**
 > Each endpoint page lists only the codes it can return, with the precise message for that path. Use this page as the cross-cutting reference.

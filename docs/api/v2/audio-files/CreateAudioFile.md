@@ -31,7 +31,7 @@ Text to synthesize. Required for TTS mode (mutually exclusive with file uploads 
 
 #### `voice` — type: *string*
 
-Voice id `provider|VoiceName` (see [`GetTTSVoices`](../voice/GetTTSVoices.md)). Defaults to `fad` when only `text` is provided.
+Voice id: exactly the `cdwv_short` returned by [`GetTTSVoices`](../voice/GetTTSVoices.md) (e.g. `Google|pt-BR-Wavenet-A`, `fad`). Defaults to `fad` when only `text` is provided. With `text`, a voice outside the account's list is rejected with code `209`; letter case is not significant.
 
 
 #### `encoding` — type: *string*
@@ -124,7 +124,7 @@ curl -X POST 'https://<base>/api/v2/CreateAudioFile.php' \
   -d '{
     "tsid": "YOUR_TSID",
     "text": "Hello, this is a test message.",
-    "voice": "google|pt-BR-Wavenet-A",
+    "voice": "Google|pt-BR-Wavenet-A",
     "name": "test message",
     "ttswrt": "1",
     "encoding": "UTF-8"
@@ -182,6 +182,9 @@ curl -X POST 'https://<base>/api/v2/CreateAudioFile.php' \
 | Code | `status` | Cause |
 | --- | --- | --- |
 | `205` | `not allowed executable file` / `Virus infected file` | The uploaded file is rejected (executable / ClamAV positive). |
+| `209` | `Voice not found` | With `text`, `voice` is not one of the voices returned by [`GetTTSVoices`](../voice/GetTTSVoices.md) for the account. Nothing was created. |
+| `210` | `TTS ElevenLabs not permitted in CreateAudioFile` | ElevenLabs voices are not allowed in this endpoint. |
+| `500` | `internal error` | The voice list could not be read (temporary failure). Nothing was created; repeat the request. |
 | `220` | `no audio or text` | None of `text`, file upload, `audio64`, nor raw body provided. |
 | `221` | `upload error code=N` | PHP `UPLOAD_ERR_*` — usually `2` (`MAX_FILE_SIZE`) or `7` (cannot write to disk). |
 | `222` | `no name_up` | File uploaded without a filename and `name_up` was not provided. |

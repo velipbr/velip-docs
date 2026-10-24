@@ -39,7 +39,7 @@ Every audio parameter must reference an audio of your account (audios shared by 
 
 #### `voice` — type: *string*
 
-TTS voice in the form `Provider|VoiceName`. Use [`GetTTSVoices`](GetTTSVoices.md) for the list of voices the account is allowed to use. ElevenLabs is **not** allowed in this endpoint.
+TTS voice: exactly the `cdwv_short` returned by [`GetTTSVoices`](GetTTSVoices.md) (e.g. `Google|pt-BR-Wavenet-A`, `MS|pt-BR-FranciscaNeural`, `Polly|Camila|neural`, `fad`). When the call has text (`text`, `text1`…`text11` or `textfail`), a voice outside the account's list is rejected with code `209` and the call is not placed; letter case is not significant. Without text, `voice` is not used (audios with `nome`/`extra*` keep the voice they were created with). When omitted, the default voice is used. ElevenLabs is **not** allowed in this endpoint.
 
 
 #### `encoding` — type: *string*
@@ -69,7 +69,7 @@ Optional campaign id, used to group analytics for many calls.
 
 #### `httpdup` — type: *integer* — default: `10`
 
-Duplicate-suppression window (seconds, 1–600). Returns code `244` when triggered. Pass `0` to disable.
+Duplicate-suppression window (seconds, 1–600). Returns code `244` when triggered. Pass `0` to disable. A request rejected by validation before becoming a call (codes such as `201`, `203`, `204`, `205`, `208`, `209`, `210`) does not count, so the corrected request can be sent again right away.
 
 
 ## TTS placeholders
@@ -337,7 +337,7 @@ curl -X POST 'https://<base>/api/v2/MakeTTSCall.php' \
     "dest": "5511999999999",
     "text": "Hello <NOME>, your appointment is confirmed.",
     "nome": "John",
-    "voice": "google|pt-BR-Wavenet-A",
+    "voice": "Google|pt-BR-Wavenet-A",
     "encoding": "UTF-8"
   }'
 ```
@@ -453,6 +453,7 @@ In addition to the [global authentication codes](../errors.md), `MakeTTSCall` ma
 | `204` | `Invalid content` / `Invalid content1` … | Call without `text*` and a `content`, `content1..content5` or `contentfail` that is not an audio id (letters and digits only, e.g. `tf785432937`). |
 | `205` | `Content not found` | An audio parameter references an audio that does not exist or does not belong to the account. In a call without `text*`, `content`, `content1..content5` and `contentfail` must exist; any audio parameter (`content`, `content1..content15`, `contentno`, `contentend`, `contentfail`, `contentdtmf`, `amd`) pointing to another account's audio is rejected. Audios shared by Velip (e.g. silences) and by accounts of the same corporate group are allowed. |
 | `208` | `Invalid rurl: …` | `rurl` is not a valid URL or points to an internal address. |
+| `209` | `Voice not found` | The call has text and `voice` is not one of the voices returned by [`GetTTSVoices`](GetTTSVoices.md) for the account. The call is not placed. |
 | `210` | `TTS … not permitted in MakeTTSCall` | Voice provider not allowed for this endpoint (e.g., ElevenLabs). |
 | `220` | `DP` | Duplicate `ctid` for the customer (when `cdcs_uni_ctid=1`). |
 | `230` | `block ddd time` | Regional or holiday block hit. |
@@ -464,6 +465,7 @@ In addition to the [global authentication codes](../errors.md), `MakeTTSCall` ma
 | `302` | `Sms no text` | SMS follow-up requested without `sms_text`. |
 | `304` | `Invalid sms_action` | `sms_action` is not in `[ok, nae, oknae, dtmf1]`. |
 | `305` | `Sms text 160 characters` | `sms_text` longer than 160 characters. |
+| `500` | `internal error` | The voice list could not be read (temporary failure). The call is not placed; repeat the request. |
 
 ## Notes
 

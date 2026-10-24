@@ -67,7 +67,7 @@ TTS text — when supplied, the endpoint generates the audio internally and uses
 
 #### `voice` — type: *string*
 
-TTS voice (`provider|VoiceName`). ElevenLabs is not allowed in this endpoint (code `210`).
+TTS voice: exactly the `cdwv_short` returned by [`GetTTSVoices`](../voice/GetTTSVoices.md) (e.g. `Google|pt-BR-Wavenet-A`, `fad`). Used only when the campaign audio is generated from `text` (simple campaign, without `audio`/`audio64`); in that case a voice outside the account's list is rejected with code `209`; letter case is not significant. ElevenLabs is not allowed in this endpoint (code `210`).
 
 
 #### `amd` — type: *string*
@@ -321,7 +321,7 @@ curl -X POST 'https://<base>/api/v2/CreateCampaign.php' \
     "name": "Welcome 2026",
     "cdlc_id": 12345,
     "text": "Hello <NOME>, welcome to Acme.",
-    "voice": "google|pt-BR-Wavenet-A",
+    "voice": "Google|pt-BR-Wavenet-A",
     "vel": "max",
     "date_start": "2026-05-08",
     "time_start": "09:00:00",
@@ -370,6 +370,8 @@ In addition to [global authentication codes](../errors.md), `CreateCampaign` may
 | `205` | Uploaded file rejected (executable). |
 | `206`/`207` | `datajson` parameter or uploaded JSON file is not valid JSON. |
 | `208` | `rurl` is not a valid URL or points to an internal address. Nothing was created. |
+| `209` | The audio is generated from `text` and `voice` is not one of the voices returned by [`GetTTSVoices`](../voice/GetTTSVoices.md) for the account. Nothing was created. |
+| `500` | The voice list could not be read (temporary failure). Nothing was created; repeat the request. |
 | `210` | TTS provider not permitted in this endpoint (ElevenLabs). |
 | `212`–`227` | Validation errors on individual parameters (`max_answered`, `mobile`, `vel`, `resends`, `time_resends`, `cp_type`, `no_block`, `limit_name`, etc.). |
 | `220`/`221` | `date_start` / `date_end` is not a valid `YYYY-MM-DD` date, or `date_end` is before the start date (`Invalid date end: before date start`). |
