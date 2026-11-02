@@ -48,3 +48,4 @@ These docs cover what integrators need to connect to the **Velip Public API** an
 - Parameters marked **required** must be sent; otherwise the endpoint returns an error code listed under each endpoint page.
 
 Also available as [introduction.md](introduction.md) for direct links from the repository.
+<!-- Teste de deploy em 2026-11-02, depois da revisão de contas e chaves da Fase 10. -->
