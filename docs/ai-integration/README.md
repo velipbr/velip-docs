@@ -126,7 +126,7 @@ If the agent cannot open GitHub pages, give it the raw files, for example `https
 - **Review what the agent wrote.** Agents make mistakes. Check the parameters against the docs and ask the agent to explain any part you do not understand.
 - **Test with your own number first**, then with a small group, then turn it on for everyone.
 - **Avoid duplicate calls.** CRMs often resend a webhook when the first attempt fails. Set `httpdup` (up to 600 seconds) so that the same number is not called twice within that window.
-- **Use `rurl` for the result** instead of polling `GetCallStatus`, which has [rate limits](../api/v2/rate-limits.md).
+- **Use `rurl` for the result** instead of polling `GetCallStatus`, which has [rate limits](../api/v2/rate-limits.md). The result comes from `35.232.103.91` or `35.184.30.236`; if your endpoint filters by IP, allow both.
 - **Restrict by IP** when your middleware has a fixed IP address: add it to the allowlist described in [Authentication](../api/v2/authentication.md).
 - **Call only people who agreed to be contacted**, at reasonable hours.
 

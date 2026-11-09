@@ -170,7 +170,7 @@ Contact-center queue id (`cc_fila.ccf_id`) to which calls are transferred. Used 
 
 #### `rurl` — type: *string*
 
-Custom callback URL for status updates. It must be a complete URL (with scheme) pointing to a public address: an invalid URL or an internal address is rejected with code `208` and nothing is created.
+Custom callback URL for status updates. It must be a complete URL (with scheme) pointing to a public address: an invalid URL or an internal address is rejected with code `208` and nothing is created. Requests to this URL come from `35.232.103.91` or `35.184.30.236`; if your endpoint filters by IP, allow both (see [Webhook delivery](../voice/GetCallStatus.md#webhook-delivery)).
 
 
 #### `tfix` — type: *string*

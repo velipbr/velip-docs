@@ -305,7 +305,7 @@ Music-on-hold mode: `1` = dial tone, `2` = default music, `3` = silence.
 
 #### `rurl` — type: *string*
 
-URL-encoded callback URL for status updates (overrides the per-account default). It must be a complete URL (with scheme) pointing to a public address: an invalid URL or an internal address is rejected with code `208` and the call is not placed.
+URL-encoded callback URL for status updates (overrides the per-account default). It must be a complete URL (with scheme) pointing to a public address: an invalid URL or an internal address is rejected with code `208` and the call is not placed. Requests to this URL come from `35.232.103.91` or `35.184.30.236`; if your endpoint filters by IP, allow both (see [Webhook delivery](GetCallStatus.md#webhook-delivery)).
 
 
 #### `numlim` — type: *integer*

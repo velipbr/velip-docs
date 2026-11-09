@@ -79,6 +79,8 @@ Marker echoed back in `origin`. Allowed `[a-zA-Z0-9_-]{1,32}`; otherwise reset t
 
 Pass `rurl` to deliver the results to your endpoint instead of receiving them inline. Per-account defaults are used when these fields are omitted.
 
+**Source IP addresses.** Requests to your `rurl` come from `35.232.103.91` or `35.184.30.236`. If your endpoint filters by IP, allow both: any delivery can come from either one. The same two addresses send to the `rurl` of [MakeTTSCall](MakeTTSCall.md) and [CreateCampaign](../campaigns/CreateCampaign.md) and to the default callback URL of the account. They only send requests and do not accept connections, so always call the API through the base URL of your account.
+
 #### `rurl` — type: *string*
 
 Public URL that receives the data.
