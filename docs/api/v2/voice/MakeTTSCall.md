@@ -327,6 +327,8 @@ Same as `numlim`, but for the same number AND the same audio.
 
 Forces a specific termination route (only when authorized for the account). Multiple routes separated by `|`, e.g., `0|100`.
 
+When the account is restricted to its own termination routes, only those routes are honored: routes outside the account's list are dropped, and if none is left (including `0`) the call goes through the account's routes. In that case the response carries `return.warning` = `tfix limited to the terminations enabled for this account`. When omitted, the call uses the account's routes.
+
 
 ## Request example
 ```bash curl (simple TTS)
@@ -439,7 +441,7 @@ curl -X POST 'https://<base>/api/v2/MakeTTSCall.php' \
 - **`return.cd_id`** (*string*) — Internal call id, prefixed with the customer database alias (`<cdcs_db>_<cd_id>`). Use it with [`GetCallStatus`](GetCallStatus.md) to query progress.
 
 
-- **`return.warning`** (*string*, optional) - Present when a parameter was ignored but the call was still processed. Currently: `callerid ignored: not allowed for this account` (see `callerid`).
+- **`return.warning`** (*string*, optional) - Present when a parameter was ignored but the call was still processed. Currently: `callerid ignored: not allowed for this account` (see `callerid`) and `tfix limited to the terminations enabled for this account` (see `tfix`). When both apply, they come together, separated by `; `.
 
 
 ## Error codes
