@@ -84,7 +84,7 @@ Optional asset group id (`cd_wav_group.cdg_id`).
 
 #### `speed` — type: *number* — default: `1`
 
-Speed factor for uploads. `1` = no change, `<1` = slower, `>1` = faster.
+Speed factor for uploads. `1` = no change, `<1` = slower, `>1` = faster. Use a dot as the decimal separator, from `0.25` to `4` (up to 4 decimal places, e.g. `0.9` or `1.15`). Any other value makes the upload fail with an error.
 
 
 #### `delsilence` — type: *integer*
@@ -92,9 +92,9 @@ Speed factor for uploads. `1` = no change, `<1` = slower, `>1` = faster.
 Silence trimming for uploads: `1` strips initial silence, `2` strips trailing silence, `3` strips both.
 
 
-#### `incsilence` — type: *integer*
+#### `incsilence` — type: *number*
 
-Number of milliseconds of silence to insert at the beginning of an upload.
+Seconds of silence to insert at the beginning of an upload, from `0` to `30`, with a dot as the decimal separator (e.g. `0.5` for half a second). `0` or empty inserts nothing. Any other value makes the upload fail with an error.
 
 
 #### `mp3` — type: *string*

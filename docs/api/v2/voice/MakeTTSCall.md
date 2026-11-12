@@ -441,7 +441,7 @@ curl -X POST 'https://<base>/api/v2/MakeTTSCall.php' \
 - **`return.cd_id`** (*string*) — Internal call id, prefixed with the customer database alias (`<cdcs_db>_<cd_id>`). Use it with [`GetCallStatus`](GetCallStatus.md) to query progress.
 
 
-- **`return.warning`** (*string*, optional) - Present when a parameter was ignored but the call was still processed. Currently: `callerid ignored: not allowed for this account` (see `callerid`) and `tfix limited to the terminations enabled for this account` (see `tfix`). When both apply, they come together, separated by `; `.
+- **`return.warning`** (*string*, optional) - Present when a parameter was ignored or limited. It tells how the request was read, so it also comes when the request fails afterwards (for example, `244` http duplicity). Currently: `callerid ignored: not allowed for this account` (see `callerid`) and `tfix limited to the terminations enabled for this account` (see `tfix`). When both apply, they come together, separated by `; `.
 
 
 ## Error codes
