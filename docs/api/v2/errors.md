@@ -25,7 +25,7 @@ Successful responses use `status: "OK"` and `status_code: "0"`.
 | HTTP | When |
 | --- | --- |
 | `200` | Operation succeeded. |
-| `400` | Business or validation error. The numeric `status_code` is the source of truth. |
+| `400` | Business or validation error. The numeric `status_code` is the source of truth. A provider's temporary rate limit also returns `400`: on `MakeWhatsapp`, Meta's `130429` and `131056` carry `return.retry_after` (seconds). |
 | `429` | Rate limit exceeded (currently only `GetCallStatus`: 200 list requests per client per hour, plus a daily cap on point lookups by `cd_id`/`ctid`). `status_code` is `429` and a `Retry-After` header (seconds) is sent. |
 | `401` | Authentication / authorization error (codes `100`–`199`). |
 

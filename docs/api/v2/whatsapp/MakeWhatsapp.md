@@ -174,6 +174,19 @@ curl -X POST 'https://<base>/api/v2/MakeWhatsapp.php' \
   }
 }
 ```
+
+```json 400 Meta rate limit (retry later)
+{
+  "return": {
+    "status": "(#130429) Rate limit hit",
+    "status_code": 130429,
+    "cdls_id": "9876545",
+    "wastatus": "failed",
+    "wamsgid": null,
+    "retry_after": 60
+  }
+}
+```
 - **`return.status`** (*string*) — `OK` on success; otherwise the upstream provider's error message or a Velip code message.
 
 
@@ -181,6 +194,9 @@ curl -X POST 'https://<base>/api/v2/MakeWhatsapp.php' \
 
 
 - **`return.cdls_id`** (*string*) — Internal log id (`cd_log_sms_*.cdls_id`). Inspect `cdls_return_log` for the full provider response.
+
+
+- **`return.retry_after`** (*integer*, optional) — Only when Meta refused the message for a temporary rate limit: `130429` (the phone number's throughput was reached; it is shared with any other platform that uses the same number) or `131056` (too many messages to the same recipient in a short time). Seconds to wait before sending the same request again. The HTTP status stays `400`, nothing is charged, and a repeat after this time is not treated as a duplicate (`250`).
 
 
 ## Error codes
@@ -197,9 +213,9 @@ In addition to the [global authentication codes](../errors.md):
 | `235` | `No from wa number` | `v8l_wa_number` is empty. |
 | `236` | `No app_id` | `app_id` / `v8l_id` missing. |
 | `238` | `no credit` | Insufficient balance: the message price is reserved from the account balance before sending, and the request is refused when the balance is not above the account limit. Nothing is sent; if the provider rejects the message, the reserved amount is returned. |
-| `250` | `http duplicidade` | Duplicate within the `httpdup` window. |
+| `250` | `http duplicidade` | Duplicate within the `httpdup` window. A previous attempt refused by Meta with `130429` or `131056` does not count. |
 | `260` | `WA not submitted <HTTP>` | Upstream returned non-2xx HTTP code. |
-| `261+` | Provider's error code | Pass-through from Meta/Gupshup error responses (e.g., `131000`). |
+| `261+` | Provider's error code | Pass-through from Meta/Gupshup error responses (e.g., `131000`). For Meta's temporary rate limits `130429` and `131056` the response also carries `return.retry_after`. |
 
 ## Notes
 
