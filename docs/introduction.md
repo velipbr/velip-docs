@@ -22,7 +22,7 @@ These docs cover what consumers of the **Velip Public API** and the **Velip MCP 
 
 | Channel | Endpoints | Notes |
 | --- | --- | --- |
-| **Voice (TTS / call)** | `MakeTTSCall`, `GetCallStatus`, `GetTTSVoices`, `PlayAudioFile`, `GetWebRTC` | Outbound TTS with DTMF/IVR, transfer to PA, recording, WebRTC. |
+| **Voice (TTS / call)** | `MakeTTSCall`, `GetCallStatus`, `GetTTSVoices`, `PlayAudioFile`, `GetWebRTC` | Outbound TTS with DTMF/IVR, transfer to PA, recording, WebRTC softphone in your own app ([guide](api/v2/voice/webrtc-softphone.md)). |
 | **SMS** | `MakeSMS` | 160-char limit (auto-cut available); per-customer providers (Matrix, Wavy/Tww, Flash). |
 | **WhatsApp** | `MakeWhatsapp`, `ValidateWhatsAppNumber`, `CreateWhatsappTemplate`, `GetWATemplates`, `DeleteWhatsappTemplate`, `CheckTemplateStatus` | HSM/templates, text/audio/image/file/video, Gupshup or Meta Cloud API providers. |
 | **Messenger / Instagram** | `MakeMessenger`, `MakeInstagram` | Meta channels via business accounts. |

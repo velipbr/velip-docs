@@ -39,7 +39,8 @@ All pages are Markdown; links work when browsing this repository on GitHub.
 | Call status / list | [voice/GetCallStatus.md](voice/GetCallStatus.md) |
 | List TTS voices | [voice/GetTTSVoices.md](voice/GetTTSVoices.md) |
 | Stream audio | [voice/PlayAudioFile.md](voice/PlayAudioFile.md) |
-| WebRTC SIP | [voice/GetWebRTC.md](voice/GetWebRTC.md) |
+| WebRTC SIP credentials | [voice/GetWebRTC.md](voice/GetWebRTC.md) |
+| Guide: WebRTC softphone in your app | [voice/webrtc-softphone.md](voice/webrtc-softphone.md) |
 
 ## Audio files
 

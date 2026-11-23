@@ -24,6 +24,8 @@ Token for the account.
 
 Destination phone number. With `setbrasil=1` (default) accepts national formats; otherwise pass full E.164 (without `+`).
 
+It can also be the `sipname` of a WebRTC softphone of your account, returned by [`GetWebRTC`](GetWebRTC.md) (`VW…`): Velip first rings the agent's browser and then dials `dest2` (use `type=3`). See the [WebRTC softphone integration guide](webrtc-softphone.md). A softphone of another account is rejected with `203`.
+
 
 #### `text` — type: *string*
 
@@ -192,6 +194,7 @@ Number (or routed target) of the second leg. Special prefixes bypass national no
 | `RT<ccba_id>` | **FastVoice AI agent** — bridges the answered call to the realtime agent (`cc_bot_agent`) identified by `ccba_id`. See [FastVoice AI agent](#fastvoice-ai-agent). |
 | `WA<number>` | WhatsApp Calling second leg. |
 | `FI<queue_id>` | Contact-center PA queue. |
+| `VW…` | WebRTC softphone of your account (`sipname` from [`GetWebRTC`](GetWebRTC.md)). A softphone of another account is rejected with `203`. |
 
 
 #### `fifo` — type: *integer*
@@ -451,7 +454,7 @@ In addition to the [global authentication codes](../errors.md), `MakeTTSCall` ma
 | Code | `status` | Cause |
 | --- | --- | --- |
 | `201` | `No text` | No `text*`, `content`, `nome`, or `extra*` provided. |
-| `203` | `number invalid` | `dest` could not be normalized. |
+| `203` | `number invalid` | `dest` could not be normalized, or `dest` / `dest2` is a WebRTC softphone (`VW…`) that is not of your account. |
 | `204` | `Invalid content` / `Invalid content1` … | Call without `text*` and a `content`, `content1..content5` or `contentfail` that is not an audio id (letters and digits only, e.g. `tf785432937`). |
 | `205` | `Content not found` | An audio parameter references an audio that does not exist or does not belong to the account. In a call without `text*`, `content`, `content1..content5` and `contentfail` must exist; any audio parameter (`content`, `content1..content15`, `contentno`, `contentend`, `contentfail`, `contentdtmf`, `amd`) pointing to another account's audio is rejected. Audios shared by Velip (e.g. silences) and by accounts of the same corporate group are allowed. |
 | `208` | `Invalid rurl: …` | `rurl` is not a valid URL or points to an internal address. |
