@@ -63,7 +63,7 @@ curl -X POST 'https://<base>/api/v2/GetWebRTC.php' \
 
 - `userid` is the agent's id **in your system**: letters and digits only, 1 to 30 characters. Use one per agent and keep it stable; the same `userid` always returns the same softphone. The `sipname` is derived from it: store the `sipname` returned, do not build it yourself.
 - Send to the browser only what the page needs (`sipname`, `sipsecret`, `sipserver`, `wss_url`, `ice_servers`), over HTTPS, and keep `sipsecret` out of logs and browser storage.
-- To replace a softphone password (for example, after a leak), call `GetWebRTC` again with `"reset": "1"` in a POST. The old password stops working for new registrations.
+- To replace a softphone password (for example, after a leak), call `GetWebRTC` again with `"reset": "1"` in a POST. The old password stops working right away; pages using it must fetch the credentials again.
 
 ## Step 2 — Register the softphone (browser)
 

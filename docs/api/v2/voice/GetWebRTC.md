@@ -29,7 +29,7 @@ Id of the agent **in your system**: letters and digits only (`A-Z`, `a-z`, `0-9`
 
 #### `reset` — type: *string*
 
-`1` replaces the softphone password and returns the new one. **POST only** (`205` otherwise). Use it when the credentials leak. A page already registered keeps its registration until it expires (300 seconds with the settings of the [guide](webrtc-softphone.md)); to register again it needs the new password.
+`1` replaces the softphone password and returns the new one. **POST only** (`205` otherwise). Use it when the credentials leak. The old password stops working right away: a page registered with it stops receiving calls and must register again with the new one.
 
 
 ## Request example
