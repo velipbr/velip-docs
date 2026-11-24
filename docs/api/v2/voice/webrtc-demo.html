@@ -293,8 +293,9 @@
       $('kvName').textContent = creds.sipname;
       $('kvServer').textContent = creds.wss;
       log('Connecting to ' + creds.wss + ' as ' + creds.sipname + '.');
+      var me;
       try {
-        ua = new JsSIP.UA({
+        me = new JsSIP.UA({
           sockets: [new JsSIP.WebSocketInterface(creds.wss)],
           uri: 'sip:' + creds.sipname + '@' + creds.server,
           password: creds.secret,
@@ -308,17 +309,21 @@
         cleanup();
         return;
       }
-      ua.on('connected', function () { log('WebSocket connected; registering…'); setStatus('Registering…', 'busy'); });
-      ua.on('disconnected', function () { log('Connection lost; JsSIP retries by itself.', 'warn'); setStatus('Connection lost', 'err'); });
-      ua.on('registered', function () { log('Registered. Waiting for a call.', 'ok'); if (!session) { setStatus('Ready', 'ok'); } });
-      ua.on('unregistered', function () { log('Unregistered.'); if (ua) { setStatus('Not registered', 'off'); } });
-      ua.on('registrationFailed', function (ev) {
+      ua = me;
+      // Events of a softphone already stopped (Disconnect) arrive late: ignore them.
+      var atual = function () { return ua === me; };
+      me.on('connected', function () { if (!atual()) { return; } log('WebSocket connected; registering…'); setStatus('Registering…', 'busy'); });
+      me.on('disconnected', function () { if (!atual()) { return; } log('Connection lost; JsSIP retries by itself.', 'warn'); setStatus('Connection lost', 'err'); });
+      me.on('registered', function () { if (!atual()) { return; } log('Registered. Waiting for a call.', 'ok'); if (!session) { setStatus('Ready', 'ok'); } });
+      me.on('unregistered', function () { if (!atual()) { return; } log('Unregistered.'); setStatus('Not registered', 'off'); });
+      me.on('registrationFailed', function (ev) {
+        if (!atual()) { return; }
         var hint = (ev.cause === JsSIP.C.causes.AUTHENTICATION_ERROR) ? ' Check sipsecret (a reset replaces it) and fetch the credentials again.' : '';
         log('Registration failed: ' + ev.cause + '.' + hint, 'err');
         setStatus('Registration failed', 'err');
       });
-      ua.on('newRTCSession', onNewSession);
-      ua.start();
+      me.on('newRTCSession', function (ev) { if (atual()) { onNewSession(ev); } });
+      me.start();
       $('btnDisconnect').disabled = false;
     });
   }
@@ -344,7 +349,7 @@
   }
 
   $('btnConnect').addEventListener('click', connect);
-  $('btnDisconnect').addEventListener('click', function () { log('Disconnecting.'); cleanup(); });
+  $('btnDisconnect').addEventListener('click', function () { log('Disconnected.'); cleanup(); });
   $('btnClear').addEventListener('click', function () { $('creds').value = ''; log('Credentials cleared from the page.'); });
   $('btnAnswer').addEventListener('click', answer);
   $('btnHangup').addEventListener('click', function () { if (session) { session.terminate(); } });
