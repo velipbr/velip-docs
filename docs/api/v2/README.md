@@ -41,6 +41,7 @@ All pages are Markdown; links work when browsing this repository on GitHub.
 | Stream audio | [voice/PlayAudioFile.md](voice/PlayAudioFile.md) |
 | WebRTC SIP credentials | [voice/GetWebRTC.md](voice/GetWebRTC.md) |
 | Guide: WebRTC softphone in your app | [voice/webrtc-softphone.md](voice/webrtc-softphone.md) |
+| Demo: WebRTC softphone test page | [webrtc-demo.html](https://developers.velip.com.br/api/v2/voice/webrtc-demo.html) |
 
 ## Audio files
 

@@ -33,6 +33,8 @@ This guide shows how a SaaS or CRM adds voice calls to its own agent screen usin
 
 Calls never start from the browser. Your API token stays in your backend, and you decide who may call and how much each of your customers may spend before you call `MakeTTSCall`.
 
+> **Try it first:** the [WebRTC softphone demo](https://developers.velip.com.br/api/v2/voice/webrtc-demo.html) is a ready test page: paste the JSON returned by `GetWebRTC`, connect, and place a call with `MakeTTSCall`. It runs only in your browser and does not store the credentials.
+
 ## Step 1 — Get the softphone credentials (backend)
 
 Call [`GetWebRTC`](GetWebRTC.md) with the same token you use for the other endpoints:

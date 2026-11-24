@@ -9,7 +9,7 @@ Returns the SIP user, password and server that a browser softphone uses to regis
 
 The endpoint must be enabled for your account by Velip, with the number of softphones you need. Until then it answers `204` (HTTP 403); ask Velip support to enable it.
 
-Call this endpoint **from your backend**, never from the browser, and pass to the agent's page only the returned credentials. The full flow (register the softphone, place the call with [`MakeTTSCall`](MakeTTSCall.md), answer it in the browser) is in the [WebRTC softphone integration guide](webrtc-softphone.md).
+Call this endpoint **from your backend**, never from the browser, and pass to the agent's page only the returned credentials. The full flow (register the softphone, place the call with [`MakeTTSCall`](MakeTTSCall.md), answer it in the browser) is in the [WebRTC softphone integration guide](webrtc-softphone.md); to try it without writing code, use the [WebRTC softphone demo](https://developers.velip.com.br/api/v2/voice/webrtc-demo.html).
 
 ## Authentication
 

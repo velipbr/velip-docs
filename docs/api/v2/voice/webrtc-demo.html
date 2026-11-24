@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>WebRTC Softphone Demo — Velip</title>
+<style>
+  :root {
+    --bg: #f6f6f8; --card: #ffffff; --text: #1b1b1b; --muted: #5d5d6b; --line: #dcdce4;
+    --accent: #5338f7; --accent-text: #ffffff; --orange: #f94c07;
+    --ok: #1b7f3b; --warn: #a15c00; --err: #c62828; --busy: #5338f7;
+    --code: #f0eff7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141418; --card: #1f1f26; --text: #ececf1; --muted: #a4a4b3; --line: #33333d;
+      --accent: #7d68ff; --accent-text: #ffffff; --orange: #ff7a45;
+      --ok: #4cc27a; --warn: #f0b45a; --err: #ff6b6b; --busy: #9d8cff;
+      --code: #2a2a33;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { padding: 20px 16px 8px; max-width: 1080px; margin: 0 auto; }
+  header h1 { margin: 0 0 4px; font-size: 22px; }
+  header p { margin: 0; color: var(--muted); }
+  header a { color: var(--accent); }
+  main { max-width: 1080px; margin: 0 auto; padding: 8px 16px 32px;
+         display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 820px) { main { grid-template-columns: 1fr; } }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
+  section h2 { margin: 0 0 10px; font-size: 16px; }
+  label { display: block; font-weight: 600; margin: 10px 0 4px; }
+  textarea, input[type=text] { width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 8px;
+         background: var(--bg); color: var(--text); font: 13px/1.4 ui-monospace, Consolas, monospace; }
+  textarea { min-height: 150px; resize: vertical; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+  button { border: 1px solid var(--line); background: var(--bg); color: var(--text); border-radius: 6px;
+           padding: 8px 14px; font: inherit; cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  button.danger { background: var(--err); border-color: var(--err); color: #fff; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  .check { display: flex; gap: 6px; align-items: center; font-weight: 400; margin: 0; }
+  .status { display: inline-block; padding: 4px 10px; border-radius: 999px; font-weight: 600;
+            border: 1px solid currentColor; }
+  .status[data-kind=off] { color: var(--muted); }
+  .status[data-kind=busy] { color: var(--busy); }
+  .status[data-kind=ok] { color: var(--ok); }
+  .status[data-kind=call] { color: var(--orange); }
+  .status[data-kind=err] { color: var(--err); }
+  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 2px 12px; margin-top: 12px; font-size: 14px; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; overflow-wrap: anywhere; font-family: ui-monospace, Consolas, monospace; }
+  #log { height: 260px; overflow: auto; background: var(--code); border-radius: 6px; padding: 8px;
+         font: 12px/1.45 ui-monospace, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+  #log .ok { color: var(--ok); } #log .warn { color: var(--warn); } #log .err { color: var(--err); }
+  .full { grid-column: 1 / -1; }
+  ol { margin: 0; padding-left: 20px; } ol li { margin: 6px 0; }
+  pre { background: var(--code); border-radius: 6px; padding: 8px; overflow-x: auto; font-size: 12px; margin: 6px 0 0; }
+  .note { color: var(--muted); font-size: 13px; margin-top: 8px; }
+  input[type=range] { width: 120px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>WebRTC softphone demo</h1>
+  <p>Test page for the <a href="webrtc-softphone/">WebRTC softphone integration</a>: paste the credentials returned by
+     <a href="GetWebRTC/">GetWebRTC</a>, connect, and place a call with <a href="MakeTTSCall/">MakeTTSCall</a>.
+     Everything runs in your browser; the credentials go only to the Velip WebRTC server and are not stored.</p>
+</header>
+
+<main>
+  <section>
+    <h2>1. Credentials</h2>
+    <label for="creds">JSON returned by GetWebRTC</label>
+    <textarea id="creds" spellcheck="false" autocomplete="off" placeholder='{"return":{"status":"OK","status_code":"0","sipname":"VW1234X...","sipsecret":"...","sipserver":"gv17.velip.com.br","wss_url":"wss://gv17.velip.com.br/ws","ice_servers":[...]}}'></textarea>
+    <label for="agent">Agent name (free text)</label>
+    <input id="agent" type="text" value="Demo agent" maxlength="40">
+    <div class="row">
+      <label class="check"><input id="autoanswer" type="checkbox" checked> Answer automatically</label>
+      <label class="check"><input id="debug" type="checkbox"> SIP debug in the browser console</label>
+    </div>
+    <div class="row">
+      <button id="btnConnect" class="primary">Connect</button>
+      <button id="btnDisconnect" disabled>Disconnect</button>
+      <button id="btnClear">Clear credentials</button>
+    </div>
+    <p class="note">Use test credentials. Anyone who has <code>sipsecret</code> can register as this agent; call
+       GetWebRTC with <code>reset=1</code> (POST) to replace it.</p>
+  </section>
+
+  <section>
+    <h2>2. Softphone</h2>
+    <span id="status" class="status" data-kind="off">Offline</span>
+    <dl class="kv">
+      <dt>Softphone</dt><dd id="kvName">—</dd>
+      <dt>Server</dt><dd id="kvServer">—</dd>
+      <dt>Call</dt><dd id="kvCall">—</dd>
+      <dt>Duration</dt><dd id="kvTime">—</dd>
+    </dl>
+    <div class="row">
+      <button id="btnAnswer" class="primary" disabled>Answer</button>
+      <button id="btnHangup" class="danger" disabled>Hang up</button>
+      <button id="btnMute" disabled>Mute</button>
+      <label class="check" for="volume">Volume <input id="volume" type="range" min="0" max="1" step="0.05" value="1"></label>
+    </div>
+    <audio id="remoteAudio" autoplay></audio>
+    <p class="note">Velip calls this softphone first and then dials the customer, so the call shown here comes from Velip.
+       Hanging up here ends the whole call.</p>
+  </section>
+
+  <section class="full">
+    <h2>3. Place a test call (from your backend or a terminal)</h2>
+    <ol>
+      <li>Get the credentials (your account must have WebRTC enabled by Velip):
+<pre>curl -X POST 'https://vox.velip.com.br/api/v2/GetWebRTC.php' \
+  -H 'Authorization: Bearer YOUR_TSID' -H 'Content-Type: application/json' \
+  -d '{ "userid": "agent01" }'</pre></li>
+      <li>Paste the JSON above and click <b>Connect</b>. Wait for <b>Ready</b>.</li>
+      <li>Place the call with <code>dest</code> = the <code>sipname</code> and <code>dest2</code> = the number to call:
+<pre>curl -X POST 'https://vox.velip.com.br/api/v2/MakeTTSCall.php' \
+  -H 'Authorization: Bearer YOUR_TSID' -H 'Content-Type: application/json' \
+  -d '{ "type": "3", "priority": "-1", "dest": "SIPNAME", "dest2": "5511999999999",
+        "content": "tf19472806", "contentfail": "tf481661861", "rec": "300", "timelimit": "300", "free": "1" }'</pre></li>
+      <li>This page rings and answers; then the number in <code>dest2</code> is dialed.</li>
+    </ol>
+  </section>
+
+  <section class="full">
+    <h2>Log</h2>
+    <div id="log" aria-live="polite"></div>
+  </section>
+</main>
+
+<script src="../../../assets/js/jssip-3.10.0.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var DEFAULT_ICE = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:gv17.velip.com.br:3478' }];
+  var $ = function (id) { return document.getElementById(id); };
+  var ua = null, session = null, creds = null, localStream = null, silentCtx = null, timer = null, startedAt = 0;
+
+  function log(msg, kind) {
+    var line = document.createElement('div');
+    if (kind) { line.className = kind; }
+    line.textContent = new Date().toLocaleTimeString() + '  ' + msg;
+    $('log').appendChild(line);
+    $('log').scrollTop = $('log').scrollHeight;
+  }
+
+  function setStatus(text, kind) { $('status').textContent = text; $('status').dataset.kind = kind; }
+
+  function setCallButtons(state) { // state: none | ringing | call
+    $('btnAnswer').disabled = state !== 'ringing';
+    $('btnHangup').disabled = state === 'none';
+    $('btnMute').disabled = state !== 'call';
+    if (state !== 'call') { $('btnMute').textContent = 'Mute'; }
+  }
+
+  // Reads the GetWebRTC JSON (whole response or just the "return" object) and validates the fields.
+  function readCreds() {
+    var raw = $('creds').value.trim();
+    if (!raw) { throw new Error('Paste the JSON returned by GetWebRTC.'); }
+    var j;
+    try { j = JSON.parse(raw); } catch (e) { throw new Error('This is not valid JSON: ' + e.message); }
+    var r = (j && typeof j === 'object' && j['return']) ? j['return'] : j;
+    if (!r || typeof r !== 'object') { throw new Error('Unexpected JSON.'); }
+    if (r.status && r.status !== 'OK') {
+      throw new Error('GetWebRTC returned an error: ' + r.status + ' (code ' + r.status_code + ').');
+    }
+    var c = {
+      sipname: String(r.sipname || ''),
+      secret: String(r.sipsecret || ''),
+      server: String(r.sipserver || ''),
+      wss: String(r.wss_url || ''),
+      ice: (Array.isArray(r.ice_servers) && r.ice_servers.length) ? r.ice_servers : DEFAULT_ICE
+    };
+    if (!/^[A-Za-z0-9]{3,64}$/.test(c.sipname)) { throw new Error('sipname is missing or invalid.'); }
+    if (!c.secret) { throw new Error('sipsecret is missing.'); }
+    if (!/^[A-Za-z0-9.-]{3,253}$/.test(c.server)) { throw new Error('sipserver is missing or invalid.'); }
+    if (!c.wss) { c.wss = 'wss://' + c.server + '/ws'; }
+    if (!/^wss:\/\/[A-Za-z0-9.-]+(:[0-9]{1,5})?\/[^\s]*$/.test(c.wss)) { throw new Error('wss_url must be a wss:// address.'); }
+    return c;
+  }
+
+  // Microphone asked once, on Connect (a click), so the browser prompt does not appear in the middle of a call.
+  // Without a microphone the call still connects with silence, and you hear the other side.
+  function getLocalStream() {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      return navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function (s) {
+        log('Microphone allowed.', 'ok');
+        return s;
+      }).catch(function (e) {
+        log('Microphone not available (' + e.name + '): the call will carry silence from this side.', 'warn');
+        return silentStream();
+      });
+    }
+    log('This browser has no getUserMedia: the call will carry silence from this side.', 'warn');
+    return Promise.resolve(silentStream());
+  }
+
+  function silentStream() {
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    silentCtx = new Ctx();
+    return silentCtx.createMediaStreamDestination().stream;
+  }
+
+  function startTimer() {
+    startedAt = Date.now();
+    timer = setInterval(function () {
+      var s = Math.floor((Date.now() - startedAt) / 1000);
+      $('kvTime').textContent = Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
+    }, 500);
+  }
+
+  function stopTimer() { if (timer) { clearInterval(timer); timer = null; } }
+
+  function attachRemote(pc) {
+    pc.addEventListener('track', function (ev) {
+      if (ev.streams && ev.streams[0]) { $('remoteAudio').srcObject = ev.streams[0]; }
+    });
+  }
+
+  function answer() {
+    if (!session || session.isEstablished()) { return; }
+    session.answer({
+      mediaStream: localStream,
+      pcConfig: { iceServers: creds.ice },
+      rtcOfferConstraints: { offerToReceiveAudio: true, offerToReceiveVideo: false }
+    });
+  }
+
+  function onNewSession(e) {
+    var s = e.session;
+    if (s.direction !== 'incoming') { return; }
+    var from = (e.request && e.request.from && e.request.from.uri) ? e.request.from.uri.user : '?';
+    var display = (e.request && e.request.from && e.request.from.display_name) ? e.request.from.display_name : '';
+    if (session) {
+      log('Second incoming call from ' + from + ' rejected (one call at a time).', 'warn');
+      s.terminate({ status_code: 486, reason_phrase: 'Busy Here' });
+      return;
+    }
+    session = s;
+    $('kvCall').textContent = 'from ' + from + (display ? ' (' + display + ')' : '');
+    log('Incoming call from ' + from + (display ? ' (' + display + ')' : '') + '.', 'ok');
+    setStatus('Ringing', 'call');
+    setCallButtons('ringing');
+
+    s.on('peerconnection', function (ev) { attachRemote(ev.peerconnection); });
+    s.on('accepted', function () { log('Call answered.'); });
+    s.on('confirmed', function () {
+      setStatus('In call', 'call');
+      setCallButtons('call');
+      startTimer();
+      if (s.connection && !$('remoteAudio').srcObject) {
+        var rs = new MediaStream();
+        s.connection.getReceivers().forEach(function (r) { if (r.track) { rs.addTrack(r.track); } });
+        $('remoteAudio').srcObject = rs;
+      }
+    });
+    s.on('ended', function (ev) { endSession('Call ended (' + (ev.originator || '') + ': ' + (ev.cause || '') + ').', ''); });
+    s.on('failed', function (ev) { endSession('Call failed (' + (ev.originator || '') + ': ' + (ev.cause || '') + ').', 'warn'); });
+
+    if ($('autoanswer').checked) {
+      log('Answering automatically.');
+      setTimeout(answer, 300);
+    }
+  }
+
+  function endSession(msg, kind) {
+    log(msg, kind);
+    session = null;
+    stopTimer();
+    $('kvCall').textContent = '—';
+    $('kvTime').textContent = '—';
+    $('remoteAudio').srcObject = null;
+    setCallButtons('none');
+    if (ua && ua.isRegistered()) { setStatus('Ready', 'ok'); }
+  }
+
+  function connect() {
+    if (ua) { return; }
+    try { creds = readCreds(); } catch (e) { log(e.message, 'err'); setStatus('Check the credentials', 'err'); return; }
+    if (typeof JsSIP === 'undefined') { log('JsSIP did not load.', 'err'); return; }
+    if ($('debug').checked) { JsSIP.debug.enable('JsSIP:*'); } else { JsSIP.debug.disable(); }
+    $('btnConnect').disabled = true;
+    setStatus('Connecting…', 'busy');
+    getLocalStream().then(function (stream) {
+      localStream = stream;
+      $('kvName').textContent = creds.sipname;
+      $('kvServer').textContent = creds.wss;
+      log('Connecting to ' + creds.wss + ' as ' + creds.sipname + '.');
+      try {
+        ua = new JsSIP.UA({
+          sockets: [new JsSIP.WebSocketInterface(creds.wss)],
+          uri: 'sip:' + creds.sipname + '@' + creds.server,
+          password: creds.secret,
+          display_name: $('agent').value.trim().slice(0, 40) || 'Demo agent',
+          register: true,
+          register_expires: 300,
+          session_timers: false
+        });
+      } catch (e) {
+        log('Could not start the softphone: ' + e.message, 'err');
+        cleanup();
+        return;
+      }
+      ua.on('connected', function () { log('WebSocket connected; registering…'); setStatus('Registering…', 'busy'); });
+      ua.on('disconnected', function () { log('Connection lost; JsSIP retries by itself.', 'warn'); setStatus('Connection lost', 'err'); });
+      ua.on('registered', function () { log('Registered. Waiting for a call.', 'ok'); if (!session) { setStatus('Ready', 'ok'); } });
+      ua.on('unregistered', function () { log('Unregistered.'); if (ua) { setStatus('Not registered', 'off'); } });
+      ua.on('registrationFailed', function (ev) {
+        var hint = (ev.cause === JsSIP.C.causes.AUTHENTICATION_ERROR) ? ' Check sipsecret (a reset replaces it) and fetch the credentials again.' : '';
+        log('Registration failed: ' + ev.cause + '.' + hint, 'err');
+        setStatus('Registration failed', 'err');
+      });
+      ua.on('newRTCSession', onNewSession);
+      ua.start();
+      $('btnDisconnect').disabled = false;
+    });
+  }
+
+  function cleanup() {
+    if (session) { try { session.terminate(); } catch (e) { /* already over */ } }
+    session = null;
+    if (ua) { try { ua.stop(); } catch (e) { /* ignore */ } }
+    ua = null;
+    if (localStream) { localStream.getTracks().forEach(function (t) { t.stop(); }); }
+    localStream = null;
+    if (silentCtx) { try { silentCtx.close(); } catch (e) { /* ignore */ } silentCtx = null; }
+    stopTimer();
+    $('kvName').textContent = '—';
+    $('kvServer').textContent = '—';
+    $('kvCall').textContent = '—';
+    $('kvTime').textContent = '—';
+    $('remoteAudio').srcObject = null;
+    setCallButtons('none');
+    $('btnConnect').disabled = false;
+    $('btnDisconnect').disabled = true;
+    setStatus('Offline', 'off');
+  }
+
+  $('btnConnect').addEventListener('click', connect);
+  $('btnDisconnect').addEventListener('click', function () { log('Disconnecting.'); cleanup(); });
+  $('btnClear').addEventListener('click', function () { $('creds').value = ''; log('Credentials cleared from the page.'); });
+  $('btnAnswer').addEventListener('click', answer);
+  $('btnHangup').addEventListener('click', function () { if (session) { session.terminate(); } });
+  $('btnMute').addEventListener('click', function () {
+    if (!session) { return; }
+    if (session.isMuted().audio) { session.unmute({ audio: true }); $('btnMute').textContent = 'Mute'; log('Microphone on.'); }
+    else { session.mute({ audio: true }); $('btnMute').textContent = 'Unmute'; log('Microphone muted.'); }
+  });
+  $('volume').addEventListener('input', function () { $('remoteAudio').volume = Number($('volume').value); });
+  window.addEventListener('beforeunload', function () { if (ua) { try { ua.stop(); } catch (e) { /* ignore */ } } });
+
+  setCallButtons('none');
+  log('Page loaded. JsSIP ' + (typeof JsSIP !== 'undefined' ? JsSIP.version : 'not loaded') + '.');
+})();
+</script>
+</body>
+</html>
