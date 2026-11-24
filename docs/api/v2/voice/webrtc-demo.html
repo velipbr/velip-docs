@@ -81,6 +81,7 @@
     <div class="row">
       <label class="check"><input id="autoanswer" type="checkbox" checked> Answer automatically</label>
       <label class="check"><input id="debug" type="checkbox"> SIP debug in the browser console</label>
+      <label class="check" title="Audio only through the TURN relay of ice_servers: if the call has audio with this on, TURN works on your network."><input id="relay" type="checkbox"> Force TURN (relay only)</label>
     </div>
     <div class="row">
       <button id="btnConnect" class="primary">Connect</button>
@@ -100,6 +101,7 @@
       <dt>Server</dt><dd id="kvServer">—</dd>
       <dt>Call</dt><dd id="kvCall">—</dd>
       <dt>Duration</dt><dd id="kvTime">—</dd>
+      <dt>Media path</dt><dd id="kvPath">—</dd>
     </dl>
     <div class="row">
       <button id="btnAnswer" class="primary" disabled>Answer</button>
@@ -225,13 +227,55 @@
     });
   }
 
+  function hasTurn(list) {
+    return list.some(function (i) {
+      var u = Array.isArray(i.urls) ? i.urls : [i.urls];
+      return u.some(function (x) { return /^turns?:/.test(String(x)); });
+    });
+  }
+
   function answer() {
     if (!session || session.isEstablished()) { return; }
+    var pcConfig = { iceServers: creds.ice };
+    if ($('relay').checked) {
+      pcConfig.iceTransportPolicy = 'relay';
+      if (!hasTurn(creds.ice)) { log('Force TURN is on, but ice_servers has no TURN entry: the call will have no audio.', 'warn'); }
+      else { log('Force TURN: audio only through the TURN relay.'); }
+    }
     session.answer({
       mediaStream: localStream,
-      pcConfig: { iceServers: creds.ice },
+      pcConfig: pcConfig,
       rtcOfferConstraints: { offerToReceiveAudio: true, offerToReceiveVideo: false }
     });
+  }
+
+  // Which path the audio took (candidate type of the selected pair): relay = through TURN,
+  // srflx = through NAT found by STUN, host = direct.
+  function reportPath(pc) {
+    if (!pc || !pc.getStats) { return; }
+    pc.getStats().then(function (stats) {
+      var pairId = null, pairs = {}, cands = {};
+      stats.forEach(function (r) {
+        if (r.type === 'transport' && r.selectedCandidatePairId) { pairId = r.selectedCandidatePairId; }
+        if (r.type === 'candidate-pair') { pairs[r.id] = r; }
+        if (r.type === 'local-candidate' || r.type === 'remote-candidate') { cands[r.id] = r; }
+      });
+      var pair = pairId ? pairs[pairId] : null;
+      if (!pair) {
+        Object.keys(pairs).forEach(function (k) {
+          var c = pairs[k];
+          if (!pair && c.state === 'succeeded' && (c.nominated || c.selected)) { pair = c; }
+        });
+      }
+      if (!pair) { log('Media path: not determined.', 'warn'); return; }
+      var lc = cands[pair.localCandidateId] || {};
+      var txt = (lc.candidateType || '?');
+      if (lc.candidateType === 'relay') { txt += ' (TURN' + (lc.relayProtocol ? ' over ' + lc.relayProtocol : '') + ')'; }
+      else if (lc.candidateType === 'srflx') { txt += ' (STUN)'; }
+      txt += ', ' + (lc.protocol || '?');
+      $('kvPath').textContent = txt;
+      log('Media path: ' + txt + '.', lc.candidateType === 'relay' ? 'ok' : '');
+    }).catch(function () { /* stats not available */ });
   }
 
   function onNewSession(e) {
@@ -250,12 +294,20 @@
     setStatus('Ringing', 'call');
     setCallButtons('ringing');
 
-    s.on('peerconnection', function (ev) { attachRemote(ev.peerconnection); });
+    s.on('peerconnection', function (ev) {
+      attachRemote(ev.peerconnection);
+      ev.peerconnection.addEventListener('iceconnectionstatechange', function () {
+        var st = ev.peerconnection.iceConnectionState;
+        if (st === 'failed') { log('No media path (ICE failed). With Force TURN, check that ice_servers has the TURN entry.', 'err'); }
+        else if (st === 'disconnected') { log('Media path interrupted.', 'warn'); }
+      });
+    });
     s.on('accepted', function () { log('Call answered.'); });
     s.on('confirmed', function () {
       setStatus('In call', 'call');
       setCallButtons('call');
       startTimer();
+      setTimeout(function () { reportPath(s.connection); }, 1500);
       if (s.connection && !$('remoteAudio').srcObject) {
         var rs = new MediaStream();
         s.connection.getReceivers().forEach(function (r) { if (r.track) { rs.addTrack(r.track); } });
@@ -277,6 +329,7 @@
     stopTimer();
     $('kvCall').textContent = '—';
     $('kvTime').textContent = '—';
+    $('kvPath').textContent = '—';
     $('remoteAudio').srcObject = null;
     setCallButtons('none');
     if (ua && ua.isRegistered()) { setStatus('Ready', 'ok'); }
@@ -342,6 +395,7 @@
     $('kvServer').textContent = '—';
     $('kvCall').textContent = '—';
     $('kvTime').textContent = '—';
+    $('kvPath').textContent = '—';
     $('remoteAudio').srcObject = null;
     setCallButtons('none');
     $('btnConnect').disabled = false;
