@@ -269,12 +269,15 @@
       }
       if (!pair) { log('Media path: not determined.', 'warn'); return; }
       var lc = cands[pair.localCandidateId] || {};
-      var txt = (lc.candidateType || '?');
-      if (lc.candidateType === 'relay') { txt += ' (TURN' + (lc.relayProtocol ? ' over ' + lc.relayProtocol : '') + ')'; }
-      else if (lc.candidateType === 'srflx') { txt += ' (STUN)'; }
-      txt += ', ' + (lc.protocol || '?');
+      // Through TURN: the browser may label the relayed candidate "prflx" (when the TURN server and the
+      // media server share an address); relayProtocol / url tell it apart.
+      var viaTurn = lc.candidateType === 'relay' || !!lc.relayProtocol || /^turns?:/.test(String(lc.url || ''));
+      var txt;
+      if (viaTurn) { txt = 'relay (TURN' + (lc.relayProtocol ? ' over ' + lc.relayProtocol : '') + ')'; }
+      else if (lc.candidateType === 'srflx' || lc.candidateType === 'prflx') { txt = lc.candidateType + ' (direct through NAT)'; }
+      else { txt = (lc.candidateType || '?') + ' (direct)'; }
       $('kvPath').textContent = txt;
-      log('Media path: ' + txt + '.', lc.candidateType === 'relay' ? 'ok' : '');
+      log('Media path: ' + txt + '.', viaTurn ? 'ok' : '');
     }).catch(function () { /* stats not available */ });
   }
 
