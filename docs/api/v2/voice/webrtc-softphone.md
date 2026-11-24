@@ -57,14 +57,15 @@ curl -X POST 'https://<base>/api/v2/GetWebRTC.php' \
     "wss_url": "wss://gv17.velip.com.br/ws",
     "ice_servers": [
       { "urls": "stun:stun.l.google.com:19302" },
-      { "urls": "stun:gv17.velip.com.br:3478" }
+      { "urls": "stun:gv17.velip.com.br:3478" },
+      { "urls": "turns:vox14.velip.com.br:443?transport=tcp", "username": "...", "credential": "..." }
     ]
   }
 }
 ```
 
 - `userid` is the agent's id **in your system**: letters and digits only, 1 to 30 characters. Use one per agent and keep it stable; the same `userid` always returns the same softphone. The `sipname` is derived from it: store the `sipname` returned, do not build it yourself.
-- Send to the browser only what the page needs (`sipname`, `sipsecret`, `sipserver`, `wss_url`, `ice_servers`), over HTTPS, and keep `sipsecret` out of logs and browser storage.
+- Send to the browser only what the page needs (`sipname`, `sipsecret`, `sipserver`, `wss_url`, `ice_servers`), over HTTPS, and keep `sipsecret` and the TURN credential in `ice_servers` out of logs and browser storage. `ice_servers` includes a TURN relay (TLS on port 443) for networks that block UDP: pass it to the browser as it comes.
 - To replace a softphone password (for example, after a leak), call `GetWebRTC` again with `"reset": "1"` in a POST. The old password stops working right away; pages using it must fetch the credentials again.
 
 ## Step 2 — Register the softphone (browser)
@@ -198,7 +199,7 @@ The agent's browser rings almost immediately; your page answers it (Step 2) and 
 
 ## Step 4 — Follow the call
 
-`cd_id` identifies the call. Use it to:
+`cd_id` identifies the call. In the end-of-call data, `cd_time_sec` is the agent's leg (from the moment the browser answered, including the time the customer's phone was ringing), `cd_time_sec2` is the customer's leg (from the customer's answer) and `cd_value` is the amount charged. Use `cd_id` to:
 
 - query the call with [`GetCallStatus`](GetCallStatus.md);
 - receive the end-of-call webhook with all call data, including the charged rate (`rurl` in [`MakeTTSCall`](MakeTTSCall.md), or the account's default callback; see [Webhook delivery](GetCallStatus.md#webhook-delivery));
@@ -206,6 +207,11 @@ The agent's browser rings almost immediately; your page answers it (Step 2) and 
 
 ## Rules and limits
 
+- **Billing:** the leg to the agent's browser (VoIP) has zero rate. You pay the call to `dest2` at your account's rates, and only when it answers.
+- **Recording:** send `rec` with any value to record the call; `startrec` = `pa` starts the recording when the customer answers (empty starts when the browser answers).
+- **Call length:** `timelimit` counts from the customer's answer; 900 seconds when omitted.
+- **Calling hours:** with `bkddd`, the time window of the area code is checked on the customer's number (`dest2`).
+- **One page per agent:** the server keeps one registration per softphone, and the last one wins. With the same credentials open in two tabs or two devices, calls go to whichever registered last, and closing one of them can stop the other from receiving calls until it registers again. Keep one active page per agent (a `BroadcastChannel` or a simple lock in your frontend avoids a second connection).
 - WebRTC is enabled per account by Velip, with a number of softphones (`204` from `GetWebRTC` while it is not enabled; `203` when a new `userid` would pass the number). Contact Velip support to enable it or raise the number.
 - `GetWebRTC`: `userid` with letters and digits only, 1 to 30 characters (`201` otherwise).
 - `MakeTTSCall` dials only softphones of your own account in `dest` / `dest2`.
@@ -216,6 +222,7 @@ The agent's browser rings almost immediately; your page answers it (Step 2) and 
 | Symptom | What to check |
 | --- | --- |
 | `registrationFailed` with `Authentication Error` | The page is using an old `sipsecret` (for example, after a `reset`). Fetch the credentials again. |
+| Calls sometimes ring in another tab, or stop arriving | The same credentials are open in two tabs or devices: keep one active page per agent. |
 | `disconnected` right after start | The page reaches `wss_url` over port 443. Corporate proxies that block WebSocket prevent the connection. |
-| Call connects but there is no audio | Microphone permission denied, page not served over HTTPS, or the browser blocked autoplay of `remoteAudio` (the agent must interact with the page once before the first call). Networks that block UDP may also prevent audio: contact Velip support. |
+| Call connects but there is no audio | Microphone permission denied, page not served over HTTPS, or the browser blocked autoplay of `remoteAudio` (the agent must interact with the page once before the first call). Networks that block UDP need the TURN entry of `ice_servers`: check that your page passes the whole list to `pcConfig.iceServers`. |
 | `MakeTTSCall` returns `203 number invalid` with `dest` = sipname | `dest` is not a softphone of the account that owns the token, or was mistyped. Use the `sipname` exactly as returned by `GetWebRTC`. |

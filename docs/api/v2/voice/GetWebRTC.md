@@ -51,7 +51,8 @@ curl -X POST 'https://<base>/api/v2/GetWebRTC.php' \
     "wss_url": "wss://gv17.velip.com.br/ws",
     "ice_servers": [
       { "urls": "stun:stun.l.google.com:19302" },
-      { "urls": "stun:gv17.velip.com.br:3478" }
+      { "urls": "stun:gv17.velip.com.br:3478" },
+      { "urls": "turns:vox14.velip.com.br:443?transport=tcp", "username": "...", "credential": "..." }
     ]
   }
 }
@@ -80,7 +81,7 @@ curl -X POST 'https://<base>/api/v2/GetWebRTC.php' \
 - **`return.wss_url`** (*string*) — WebSocket address of the SIP server (port 443).
 
 
-- **`return.ice_servers`** (*array*) — STUN servers to use in the browser `RTCPeerConnection` (`pcConfig.iceServers`).
+- **`return.ice_servers`** (*array*) — STUN and TURN servers to use in the browser `RTCPeerConnection` (`pcConfig.iceServers`), as returned. The TURN entry (TLS on port 443, with `username` and `credential`) relays the audio on networks that block UDP. Pass the list as it comes; do not store or log the TURN credential.
 
 
 `sipname`, `sipsecret` and `sipserver` come empty on any error; `wss_url` and `ice_servers` come only on success.

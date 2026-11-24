@@ -87,8 +87,9 @@
       <button id="btnDisconnect" disabled>Disconnect</button>
       <button id="btnClear">Clear credentials</button>
     </div>
-    <p class="note">Use test credentials. Anyone who has <code>sipsecret</code> can register as this agent; call
-       GetWebRTC with <code>reset=1</code> (POST) to replace it.</p>
+    <p class="note">Paste the whole JSON: its <code>ice_servers</code> include the TURN relay used on networks that block UDP. Use test credentials. Anyone who has <code>sipsecret</code> can register as this agent; call
+       GetWebRTC with <code>reset=1</code> (POST) to replace it. Do not open the same credentials in another tab:
+       the last registration receives the calls.</p>
   </section>
 
   <section>

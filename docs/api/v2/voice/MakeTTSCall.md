@@ -230,12 +230,18 @@ Set `dest2=RT<ccba_id>` to have an autonomous **FastVoice** agent answer the sec
 
 #### `rec` — type: *integer*
 
-Maximum seconds of recording to keep. Set together with `mrec` for legacy compatibility.
+Turns recording on. In calls with a second leg (`type=2` / `type=3`, including a WebRTC softphone as `dest`), any value turns on the recording of the call and the number does not limit its length: it records until the call ends. In the other types it is the maximum seconds of recording. `mrec` is the legacy form.
 
 
 #### `startrec` — type: *string*
 
-When recording starts: `pa` (after PA bridge), `conf` (after conference forms), or `ini` (from the start).
+Where the recording starts in calls with a second leg (use with `rec`):
+
+| Value | Recording starts |
+| --- | --- |
+| `ini` or empty | When the first leg (`dest`) answers. Includes the `content` audio and the ringing of `dest2`. |
+| `pa` | When the second leg (`dest2`) answers. |
+| `conf` | When the second leg is joined to the conversation, after its opening audio. |
 
 
 ## Scheduling and retries
@@ -262,7 +268,7 @@ Maximum ring duration in seconds.
 
 #### `timelimit` — type: *integer*
 
-Maximum total call duration in seconds.
+Maximum conversation time in seconds. In calls with a second leg (`type=2` / `type=3`) it counts from the moment `dest2` answers and applies to both legs; before that, the platform waits about 30 seconds for `dest2` to answer. When omitted (or `0`), 900 seconds (15 minutes). There is no upper limit.
 
 
 #### `answer` — type: *integer*
@@ -310,6 +316,16 @@ Music-on-hold mode: `1` = dial tone, `2` = default music, `3` = silence.
 
 URL-encoded callback URL for status updates (overrides the per-account default). It must be a complete URL (with scheme) pointing to a public address: an invalid URL or an internal address is rejected with code `208` and the call is not placed. Requests to this URL come from `35.232.103.91` or `35.184.30.236`; if your endpoint filters by IP, allow both (see [Webhook delivery](GetCallStatus.md#webhook-delivery)).
 
+In calls with a second leg, the end-of-call callback carries one set of fields per leg:
+
+| Field | Meaning |
+| --- | --- |
+| `cd_time_sec` | First leg (`dest`): seconds from its answer to the end of the call. Includes the time `dest2` was ringing. |
+| `cd_time_sec2` | Second leg (`dest2`): seconds from its answer to the end of the call. |
+| `cd_called_status` / `cd_called_status2` | `OK` when that leg answered. |
+| `cd_price` | Rate of the first leg. |
+| `cd_value` | Total charged: first leg + second leg. With a WebRTC softphone as `dest`, the first leg (VoIP) has zero rate, so `cd_value` is the cost of the call to `dest2`. |
+
 
 #### `numlim` — type: *integer*
 
@@ -323,7 +339,14 @@ Same as `numlim`, but for the same number AND the same audio.
 
 #### `bkddd` — type: *integer*
 
-`1` rejects calls outside the configured DDD time window. `2` queues them silently.
+Applies the calling-time window of the destination's area code (time of day, Saturday, weekend and holidays):
+
+| Value | Outside the window |
+| --- | --- |
+| `1` | The call is refused: `230 block ddd time`, `cd_id` `0`, nothing is recorded. |
+| `2` | The call is not placed either, but the attempt is recorded in the call history with status `SK` (skipped) and the response (`230`) carries its `cd_id`. There is no automatic retry. |
+
+The window is checked on `dest`. When `dest` is a WebRTC softphone (`VW…`), it is checked on `dest2` (for `WA<number>`, on the number).
 
 
 #### `tfix` — type: *string*
@@ -461,7 +484,7 @@ In addition to the [global authentication codes](../errors.md), `MakeTTSCall` ma
 | `209` | `Voice not found` | The call has text and `voice` is not one of the voices returned by [`GetTTSVoices`](GetTTSVoices.md) for the account. The call is not placed. |
 | `210` | `TTS … not permitted in MakeTTSCall` | Voice provider not allowed for this endpoint (e.g., ElevenLabs). |
 | `220` | `DP` | Duplicate `ctid` for the customer (when `cdcs_uni_ctid=1`). |
-| `230` | `block ddd time` | Regional or holiday block hit. |
+| `230` | `block ddd time` | Outside the calling-time window of the destination's area code (see `bkddd`). With `bkddd=2` the response carries the `cd_id` of the attempt recorded as `SK`. |
 | `244` | `http duplicity` | Duplicate within `httpdup` window. |
 | `250` | `<MakeCall status>` | Underlying `MakeCall.php` failed; `errodet` carries the raw response. |
 | `260` | `error audio file` | Audio queue insertion failed. |
