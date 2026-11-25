@@ -78,7 +78,16 @@ All pages are Markdown; links work when browsing this repository on GitHub.
 
 | Endpoint | File |
 | --- | --- |
-| Send (Gmail OAuth) | [email/SendGmailOAuth.md](email/SendGmailOAuth.md) |
+| Send (Gmail or Microsoft 365, template, attachments) | [email/SendEmailOAuth.md](email/SendEmailOAuth.md) |
+| Send (Gmail OAuth, older) | [email/SendGmailOAuth.md](email/SendGmailOAuth.md) |
+
+## Message status and reports
+
+| Endpoint | File |
+| --- | --- |
+| Message status / list (SMS, WhatsApp, e-mail) | [messages/GetMessageStatus.md](messages/GetMessageStatus.md) |
+| List message campaigns | [messages/GetMessageCampaignsList.md](messages/GetMessageCampaignsList.md) |
+| Summary per channel | [messages/GetChannelSummary.md](messages/GetChannelSummary.md) |
 
 ## Credit purchase
 

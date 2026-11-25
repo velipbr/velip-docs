@@ -7,7 +7,7 @@
 | **Permission** | `gmail` |
 | **REST equivalent** | [SendGmailOAuth](../../api/v2/email/SendGmailOAuth.md) |
 
-Sends HTML email through a Gmail account authorized via OAuth in the Velip control panel.
+Sends HTML email through a Gmail account authorized via OAuth in the Velip control panel. [send_email](send_email.md) also covers Microsoft 365 / Outlook, templates and attachments.
 
 ## Parameters
 

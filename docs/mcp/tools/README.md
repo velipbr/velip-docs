@@ -36,11 +36,21 @@ All tools require `Authorization: Bearer YOUR_TOKEN_30_CHARS` and the matching [
 | [get_wa_templates](get_wa_templates.md) | `whatsapp` | [GetWATemplates](../../api/v2/whatsapp/GetWATemplates.md) |
 | [get_wa_lines](get_wa_lines.md) | `whatsapp` | *(Velip DB — no standalone REST page)* |
 
-## Gmail
+## E-mail (Gmail and Microsoft 365)
 
 | Tool | Permission | REST equivalent |
 | --- | --- | --- |
+| [send_email](send_email.md) | `gmail` | [SendEmailOAuth](../../api/v2/email/SendEmailOAuth.md) |
+| [list_email_templates](list_email_templates.md) | `gmail` | *(none — templates are managed in the Velip portal)* |
 | [send_gmail_oauth](send_gmail_oauth.md) | `gmail` | [SendGmailOAuth](../../api/v2/email/SendGmailOAuth.md) |
+
+## Message status and reports
+
+| Tool | Permission | REST equivalent |
+| --- | --- | --- |
+| [get_message_status](get_message_status.md) | the channel asked: `sms`, `whatsapp` or `gmail` | [GetMessageStatus](../../api/v2/messages/GetMessageStatus.md) |
+| [get_message_campaigns](get_message_campaigns.md) | the channel asked: `sms`, `whatsapp` or `gmail` | [GetMessageCampaignsList](../../api/v2/messages/GetMessageCampaignsList.md) |
+| [get_channel_summary](get_channel_summary.md) | any of `sms`, `whatsapp`, `gmail`, `telephony` | [GetChannelSummary](../../api/v2/messages/GetChannelSummary.md) |
 
 ## Calling a tool
 

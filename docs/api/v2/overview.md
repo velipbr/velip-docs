@@ -32,7 +32,7 @@ When validation or auth fails, `status` carries the error message and `status_co
 | `400` | Validation / business error. `status_code` carries the precise code. |
 | `401` | Authentication failure (token, IP allowlist, or brute-force lockout). |
 
-The [credit purchase](credit/CreatePixCharge.md) endpoints also use `403`, `404`, `409`, `422`, `429`, `500`, `502` and `503`; each page lists when.
+The [credit purchase](credit/CreatePixCharge.md) endpoints also use `403`, `404`, `409`, `422`, `429`, `500`, `502` and `503`; each page lists when. The status and report endpoints ([`GetCallStatus`](voice/GetCallStatus.md), [`GetMessageStatus`](messages/GetMessageStatus.md), [`GetMessageCampaignsList`](messages/GetMessageCampaignsList.md), [`GetChannelSummary`](messages/GetChannelSummary.md)) use `429` for their rate limits and `500` for a temporary failure.
 
 ## Endpoint catalogue
 
@@ -43,7 +43,8 @@ The [credit purchase](credit/CreatePixCharge.md) endpoints also use `403`, `404`
 - **[Campaigns](campaigns/CreateCampaign.md)** — Create, edit, and list campaigns and contact-center queues.
 - **[Destinations](destinations/CreateDestinationBase.md)** — Manage destination lists used by campaigns.
 - **[Messenger / Instagram](messenger/MakeMessenger.md)** — Send messages on Meta channels.
-- **[Email (Gmail OAuth)](email/SendGmailOAuth.md)** — Send transactional email through customer-owned Gmail accounts.
+- **[Email (OAuth)](email/SendEmailOAuth.md)** — Send transactional email through customer-owned Gmail or Microsoft 365 mailboxes, with templates and attachments.
+- **[Message status and reports](messages/GetMessageStatus.md)** — Status of SMS, WhatsApp and e-mail sends, bulk message campaigns, and totals per channel.
 - **[Credit purchase](credit/CreatePixCharge.md)** — Buy credit with PIX and check the charge status and the balance.
 - **[Auth helpers](auth-token/GetUserID.md)** — Validate credentials and introspect the current account.
 

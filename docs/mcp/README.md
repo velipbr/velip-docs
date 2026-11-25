@@ -28,7 +28,8 @@ The Velip MCP server exposes Velip APIs (SMS, voice, WhatsApp, email, campaigns)
 | Telephony | [make_tts_call](tools/make_tts_call.md), [get_tts_voices](tools/get_tts_voices.md), [get_call_status](tools/get_call_status.md), [get_campaigns_list](tools/get_campaigns_list.md), [get_campaign_groups](tools/get_campaign_groups.md), [create_campaign](tools/create_campaign.md), [clone_campaign](tools/clone_campaign.md), [change_campaign](tools/change_campaign.md) |
 | Destination bases | [create_destination_base](tools/create_destination_base.md), [get_destination_bases](tools/get_destination_bases.md) |
 | WhatsApp | [send_whatsapp](tools/send_whatsapp.md), [get_wa_templates](tools/get_wa_templates.md), [get_wa_lines](tools/get_wa_lines.md) |
-| Gmail | [send_gmail_oauth](tools/send_gmail_oauth.md) |
+| E-mail (Gmail and Microsoft 365) | [send_email](tools/send_email.md), [list_email_templates](tools/list_email_templates.md), [send_gmail_oauth](tools/send_gmail_oauth.md) |
+| Message status and reports | [get_message_status](tools/get_message_status.md), [get_message_campaigns](tools/get_message_campaigns.md), [get_channel_summary](tools/get_channel_summary.md) |
 
 Full tool index: [tools/README.md](tools/README.md)
 

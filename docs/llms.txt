@@ -68,7 +68,14 @@ Essentials for every REST request:
 
 ## E-mail
 
-- [SendGmailOAuth](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/email/SendGmailOAuth.md): send e-mail through the customer's Gmail account (OAuth).
+- [SendEmailOAuth](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/email/SendEmailOAuth.md): send e-mail through the customer's Gmail or Microsoft 365 mailbox (OAuth), with free content or a template (`template_id` + `vars` as a JSON string) and up to 5 attachments; returns the `id` for GetMessageStatus.
+- [SendGmailOAuth](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/email/SendGmailOAuth.md): older Gmail-only version of SendEmailOAuth.
+
+## Message status and reports
+
+- [GetMessageStatus](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/messages/GetMessageStatus.md): status of SMS, WhatsApp and e-mail sends (one message by `id`, `message_id` or `ctid`, or a list by period, campaign, recipient and status); normalized status, masked numbers, 200 lists per hour and 5,000 lookups per day.
+- [GetMessageCampaignsList](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/messages/GetMessageCampaignsList.md): bulk SMS, WhatsApp and e-mail campaigns with state and optional delivery stats.
+- [GetChannelSummary](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/messages/GetChannelSummary.md): totals per channel (SMS, WhatsApp, e-mail, voice) for a period, by status and value.
 
 ## Credit purchase
 
@@ -86,5 +93,5 @@ Essentials for every REST request:
 - [MCP getting started](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/getting-started.md): token, connectivity check, first SMS.
 - [MCP authentication](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/authentication.md): Bearer tokens and their relation to the REST token.
 - [MCP permissions](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/permissions.md): channel access per token and tool filtering.
-- [MCP tools reference](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/tools/README.md): one page per tool (`send_sms`, `make_tts_call`, `send_whatsapp`, campaigns, destination bases, templates and more).
+- [MCP tools reference](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/tools/README.md): one page per tool (`send_sms`, `make_tts_call`, `send_whatsapp`, `send_email`, message status and reports, campaigns, destination bases, templates and more).
 - Clients: [Cursor](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/clients/cursor.md), [Claude Desktop](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/clients/claude-desktop.md), [curl](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/clients/curl.md), [custom client](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/clients/custom.md).

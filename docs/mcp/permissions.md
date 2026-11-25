@@ -36,7 +36,9 @@ Permissions are configured by your account administrator in the Velip token mana
 | `telephony` | `make_tts_call`, `get_tts_voices`, `get_call_status`, `get_campaigns_list`, `get_campaign_groups`, `create_campaign`, `clone_campaign`, `change_campaign` |
 | `destinations` | `create_destination_base`, `get_destination_bases` |
 | `whatsapp` | `send_whatsapp`, `get_wa_templates`, `get_wa_lines` |
-| `gmail` | `send_gmail_oauth` |
+| `gmail` | `send_email`, `list_email_templates`, `send_gmail_oauth` |
+
+The status and report tools serve several channels. `get_message_status` and `get_message_campaigns` are listed when the token has `sms`, `whatsapp` or `gmail`, and each call needs the channel it asks for (`gmail` for `email`). `get_channel_summary` is listed with any of `sms`, `whatsapp`, `gmail` or `telephony` and returns only the channels the token has.
 
 Destination bases have their own channel because the same base feeds voice, SMS, WhatsApp and e-mail batch campaigns. To create a voice campaign from an existing base, the token needs both `destinations` (to find the base) and `telephony` (to create the campaign).
 
@@ -51,7 +53,7 @@ This is intentional: AI agents should only discover tools they are allowed to us
 | Scenario | Result |
 | --- | --- |
 | Only `sms.enabled: true` | `tools/list` returns `send_sms` only |
-| All channels enabled | Full catalog (13 tools) |
+| All channels enabled | Full catalog (20 tools) |
 | `enabled: false` at root | Empty `tools/list`, all calls rejected |
 | Call `make_tts_call` without telephony | `403 Permission denied` |
 

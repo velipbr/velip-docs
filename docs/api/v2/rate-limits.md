@@ -62,6 +62,17 @@ Voice and SMS endpoints can apply a regional time block (DDD-level) when the cus
 | [`CreatePixCharge`](credit/CreatePixCharge.md) | One charge being created at a time per account (waits up to 10 s) | HTTP 429, code `242`, with `Retry-After`. |
 | [`GetChargeStatus`](credit/GetChargeStatus.md) | 60 requests per hour per account, balance-only requests included | HTTP 429, code `210`, with `Retry-After`. |
 
+## 5. Status and report queries
+
+| Endpoint | Limit | Result |
+| --- | --- | --- |
+| [`GetCallStatus`](voice/GetCallStatus.md) | 200 list requests per account per hour; single lookups capped per day in proportion to the call volume | HTTP 429, code `429`, with `Retry-After`. |
+| [`GetMessageStatus`](messages/GetMessageStatus.md) | 200 list requests per account per hour; 5,000 single lookups (`id`, `message_id`, `ctid` of one message) per account per day | HTTP 429, code `429`, with `Retry-After`. |
+| [`GetMessageCampaignsList`](messages/GetMessageCampaignsList.md) | 200 requests per account per hour | HTTP 429, code `429`, with `Retry-After`. |
+| [`GetChannelSummary`](messages/GetChannelSummary.md) | 200 requests per account per hour | HTTP 429, code `429`, with `Retry-After`. |
+
+Requests refused by validation (codes `460`–`466`) do not count. Prefer one list by campaign or period over polling each message or call.
+
 ## Recommendations
 
 - For high-volume integrations, batch sends through a queue and respect the duplicate-suppression window — repeated retries amplify the brute-force counters.

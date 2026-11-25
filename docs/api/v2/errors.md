@@ -26,7 +26,7 @@ Successful responses use `status: "OK"` and `status_code: "0"`.
 | --- | --- |
 | `200` | Operation succeeded. |
 | `400` | Business or validation error. The numeric `status_code` is the source of truth. A provider's temporary rate limit also returns `400`: on `MakeWhatsapp`, Meta's `130429` and `131056` carry `return.retry_after` (seconds). |
-| `429` | Rate limit exceeded. `GetCallStatus`: 200 list requests per client per hour, plus a daily cap on point lookups by `cd_id`/`ctid`; `status_code` is `429` and a `Retry-After` header (seconds) is sent. Credit purchase: see [`CreatePixCharge`](credit/CreatePixCharge.md) (`240`–`242`) and [`GetChargeStatus`](credit/GetChargeStatus.md) (`210`). |
+| `429` | Rate limit exceeded. `GetCallStatus`: 200 list requests per client per hour, plus a daily cap on point lookups by `cd_id`/`ctid`; `status_code` is `429` and a `Retry-After` header (seconds) is sent. [`GetMessageStatus`](messages/GetMessageStatus.md), [`GetMessageCampaignsList`](messages/GetMessageCampaignsList.md) and [`GetChannelSummary`](messages/GetChannelSummary.md) work the same way (see [Rate limits](rate-limits.md)). Credit purchase: see [`CreatePixCharge`](credit/CreatePixCharge.md) (`240`–`242`) and [`GetChargeStatus`](credit/GetChargeStatus.md) (`210`). |
 | `401` | Authentication / authorization error (codes `100`–`199`). |
 | `403`, `404`, `409`, `422`, `500`, `502`, `503` | Used by the credit purchase endpoints ([`CreatePixCharge`](credit/CreatePixCharge.md), [`GetChargeStatus`](credit/GetChargeStatus.md)): account not allowed to buy, charge not found, `reference` conflict, registration incomplete, and payment provider failures. Each page lists the codes. |
 
@@ -78,6 +78,7 @@ These come from individual endpoints. The exact set of codes varies — see each
 | `302` | `Sms no text` | `MakeTTSCall` requested SMS follow-up without `sms_text`. |
 | `304` | `Invalid sms_action` | `sms_action` is not one of `ok`, `nae`, `oknae`, `dtmf1`. |
 | `305` | `Sms text 160 characters` | SMS follow-up text longer than 160 characters. |
+| `460`–`466` | `Invalid channel ...`, `Invalid date ...`, `Period too long ...` | Message status and report endpoints ([`GetMessageStatus`](messages/GetMessageStatus.md), [`GetMessageCampaignsList`](messages/GetMessageCampaignsList.md), [`GetChannelSummary`](messages/GetChannelSummary.md)): invalid channel (`460`), date (`461`), period too long (`462`), dates inverted (`463`), status (`464`), id (`465`) or recipient (`466`). |
 | `500` | `internal error` | Temporary failure on the Velip side (for example, the database could not be read). Nothing was created; repeat the same request later. |
 
 > **Note**
@@ -92,4 +93,4 @@ Some channel responses pass through the upstream provider's error message in `st
 - SMS Wavy/Tww: `OK`, `NA`, `WR`.
 - Matrix: HTTP body returned by the provider.
 
-When `status_code` is `0` and `status` is non-OK, the call left Velip but failed downstream. Check the `cdls_id` / `cd_id` returned in the response and consult [`GetCallStatus`](voice/GetCallStatus.md) (for voice) or your delivery report dashboard.
+When `status_code` is `0` and `status` is non-OK, the call left Velip but failed downstream. Check the `cdls_id` / `cd_id` returned in the response and consult [`GetCallStatus`](voice/GetCallStatus.md) (for voice) or [`GetMessageStatus`](messages/GetMessageStatus.md) (for SMS, WhatsApp and e-mail).

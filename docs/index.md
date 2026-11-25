@@ -49,7 +49,11 @@ curl -X POST 'https://vox.velip.com.br/api/v2/MakeSMS.php' \
 | Reach many contacts at once (campaign) | [CreateDestinationBase](api/v2/destinations/CreateDestinationBase.md), [CreateCampaign](api/v2/campaigns/CreateCampaign.md), [GetCampaignsList](api/v2/campaigns/GetCampaignsList.md), [ChangeCampaign](api/v2/campaigns/ChangeCampaign.md), [GetDestinationsList](api/v2/destinations/GetDestinationsList.md) |
 | Manage contact-center queues | [CreateCenterQueue](api/v2/campaigns/CreateCenterQueue.md), [GetCenterQueues](api/v2/campaigns/GetCenterQueues.md) |
 | Send on Messenger or Instagram | [MakeMessenger](api/v2/messenger/MakeMessenger.md), [MakeInstagram](api/v2/instagram/MakeInstagram.md) |
-| Send e-mail from a Gmail account | [SendGmailOAuth](api/v2/email/SendGmailOAuth.md) |
+| Check what happened to an SMS, WhatsApp or e-mail I sent | [GetMessageStatus](api/v2/messages/GetMessageStatus.md) |
+| List my SMS, WhatsApp and e-mail campaigns and their results | [GetMessageCampaignsList](api/v2/messages/GetMessageCampaignsList.md) |
+| See totals per channel for a period (dashboard, report) | [GetChannelSummary](api/v2/messages/GetChannelSummary.md) |
+| Send e-mail from a Gmail or Microsoft 365 account (template, attachments) | [SendEmailOAuth](api/v2/email/SendEmailOAuth.md) |
+| Send e-mail from a Gmail account (older, Gmail only) | [SendGmailOAuth](api/v2/email/SendGmailOAuth.md) |
 | Buy credit with PIX | [CreatePixCharge](api/v2/credit/CreatePixCharge.md) |
 | Check a payment or the balance | [GetChargeStatus](api/v2/credit/GetChargeStatus.md) |
 | Check that the token works | [GetUserID](api/v2/auth-token/GetUserID.md) |

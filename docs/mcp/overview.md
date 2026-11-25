@@ -33,7 +33,7 @@ Both interfaces use the **same account token** and enforce the **same business r
 
 ## What is available
 
-13 MCP tools covering SMS, outbound voice (TTS), WhatsApp, Gmail OAuth, campaigns, destinations, and call status. See the [tools index](tools/README.md).
+20 MCP tools covering SMS, outbound voice (TTS), WhatsApp, e-mail (Gmail and Microsoft 365, with templates), campaigns, destinations, call status, and the status and reports of SMS, WhatsApp and e-mail. See the [tools index](tools/README.md).
 
 Tools not listed in your `tools/list` response are hidden because your token lacks permission for that channel — not because they do not exist.
 

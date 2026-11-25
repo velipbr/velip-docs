@@ -9,6 +9,9 @@ Sends an email using a Gmail account that the customer has connected via OAuth 2
 
 Use this when you want emails to come from your own Gmail/Google Workspace identity (and inherit your own deliverability reputation) instead of Velip's transactional sender.
 
+> **Note**
+> [`SendEmailOAuth`](SendEmailOAuth.md) does the same for Gmail **and** Microsoft 365 / Outlook, and adds templates, attachments and the `id` to check the send with [`GetMessageStatus`](../messages/GetMessageStatus.md). Prefer it in new integrations.
+
 ## Authentication
 
 Token authentication required. See [Authentication](../authentication.md). Additionally, the `from_email` must already be linked to your customer through the Velip portal's Gmail OAuth onboarding flow (records stored in `cd_oauth_connections` + `cd_oauth_providers`).
