@@ -2,7 +2,7 @@
 
 All pages are Markdown; links work when browsing this repository on GitHub.
 
-> **Looking for the MCP interface?** See the [MCP server docs](../mcp/README.md) — same capabilities exposed as tools for AI clients (Cursor, Claude, etc.).
+> **Looking for the MCP interface?** See the [MCP server docs](../../mcp/README.md) — same capabilities exposed as tools for AI clients (Cursor, Claude, etc.).
 
 ## Core
 
@@ -79,6 +79,13 @@ All pages are Markdown; links work when browsing this repository on GitHub.
 | Endpoint | File |
 | --- | --- |
 | Send (Gmail OAuth) | [email/SendGmailOAuth.md](email/SendGmailOAuth.md) |
+
+## Credit purchase
+
+| Endpoint | File |
+| --- | --- |
+| Buy credit with PIX | [credit/CreatePixCharge.md](credit/CreatePixCharge.md) |
+| Charge status and balance | [credit/GetChargeStatus.md](credit/GetChargeStatus.md) |
 
 ## Auth
 

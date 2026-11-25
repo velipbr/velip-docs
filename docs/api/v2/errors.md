@@ -26,8 +26,9 @@ Successful responses use `status: "OK"` and `status_code: "0"`.
 | --- | --- |
 | `200` | Operation succeeded. |
 | `400` | Business or validation error. The numeric `status_code` is the source of truth. A provider's temporary rate limit also returns `400`: on `MakeWhatsapp`, Meta's `130429` and `131056` carry `return.retry_after` (seconds). |
-| `429` | Rate limit exceeded (currently only `GetCallStatus`: 200 list requests per client per hour, plus a daily cap on point lookups by `cd_id`/`ctid`). `status_code` is `429` and a `Retry-After` header (seconds) is sent. |
+| `429` | Rate limit exceeded. `GetCallStatus`: 200 list requests per client per hour, plus a daily cap on point lookups by `cd_id`/`ctid`; `status_code` is `429` and a `Retry-After` header (seconds) is sent. Credit purchase: see [`CreatePixCharge`](credit/CreatePixCharge.md) (`240`–`242`) and [`GetChargeStatus`](credit/GetChargeStatus.md) (`210`). |
 | `401` | Authentication / authorization error (codes `100`–`199`). |
+| `403`, `404`, `409`, `422`, `500`, `502`, `503` | Used by the credit purchase endpoints ([`CreatePixCharge`](credit/CreatePixCharge.md), [`GetChargeStatus`](credit/GetChargeStatus.md)): account not allowed to buy, charge not found, `reference` conflict, registration incomplete, and payment provider failures. Each page lists the codes. |
 
 ## Authentication and access control (1xx)
 

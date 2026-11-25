@@ -2,7 +2,7 @@
 
 *Per-IP, per-user, and per-channel quotas enforced by the API.*
 
-The Velip API enforces three layers of throttling. They are independent — a request may be rejected for hitting any of them.
+The Velip API enforces several layers of throttling. They are independent — a request may be rejected for hitting any of them.
 
 ## 1. Anti brute-force (authentication)
 
@@ -52,6 +52,15 @@ Each customer maintains a destination block list (`cd_bloqueados_cli`). Sends to
 ### Per-call regional / holiday block
 
 Voice and SMS endpoints can apply a regional time block (DDD-level) when the customer enables it (`bkddd=1` or `bkddd=2`). Sends outside the configured window return code `230` (`block ddd time`). With `bkddd=2`, the message is queued silently rather than rejected outright.
+
+## 4. Credit purchase
+
+| Endpoint | Limit | Result |
+| --- | --- | --- |
+| [`CreatePixCharge`](credit/CreatePixCharge.md) | 10 unpaid charges per account created in the last hour (API and portal) | HTTP 429, code `240`. |
+| [`CreatePixCharge`](credit/CreatePixCharge.md) | 12 attempts in 6 minutes and 120 per hour per user; 1,000 per account per day. Refused attempts count too | HTTP 429, code `241`. |
+| [`CreatePixCharge`](credit/CreatePixCharge.md) | One charge being created at a time per account (waits up to 10 s) | HTTP 429, code `242`, with `Retry-After`. |
+| [`GetChargeStatus`](credit/GetChargeStatus.md) | 60 requests per hour per account, balance-only requests included | HTTP 429, code `210`, with `Retry-After`. |
 
 ## Recommendations
 

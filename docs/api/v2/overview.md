@@ -32,6 +32,8 @@ When validation or auth fails, `status` carries the error message and `status_co
 | `400` | Validation / business error. `status_code` carries the precise code. |
 | `401` | Authentication failure (token, IP allowlist, or brute-force lockout). |
 
+The [credit purchase](credit/CreatePixCharge.md) endpoints also use `403`, `404`, `409`, `422`, `429`, `500`, `502` and `503`; each page lists when.
+
 ## Endpoint catalogue
 
 - **[SMS](sms/MakeSMS.md)** — Send a single SMS message.
@@ -42,6 +44,7 @@ When validation or auth fails, `status` carries the error message and `status_co
 - **[Destinations](destinations/CreateDestinationBase.md)** — Manage destination lists used by campaigns.
 - **[Messenger / Instagram](messenger/MakeMessenger.md)** — Send messages on Meta channels.
 - **[Email (Gmail OAuth)](email/SendGmailOAuth.md)** — Send transactional email through customer-owned Gmail accounts.
+- **[Credit purchase](credit/CreatePixCharge.md)** — Buy credit with PIX and check the charge status and the balance.
 - **[Auth helpers](auth-token/GetUserID.md)** — Validate credentials and introspect the current account.
 
 ## Read this first

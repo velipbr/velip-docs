@@ -39,6 +39,7 @@ docs/
     messenger/
     instagram/
     email/
+    credit/                    # buy credit with PIX, charge status and balance
     auth-token/
   mcp/
     README.md                  # MCP section index

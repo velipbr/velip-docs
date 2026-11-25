@@ -32,6 +32,7 @@ These docs cover what integrators need to connect to the **Velip Public API** an
 | **Email** | `SendGmailOAuth` | Gmail OAuth-backed sender. |
 | **Campaigns / queues** | `CreateCampaign`, `ChangeCampaign`, `GetCampaignsList`, `CreateCenterQueue`, `GetCenterQueues` | Campaign lifecycle and contact-center queue management. |
 | **Destinations** | `CreateDestinationBase`, `GetDestinationsList` | Manage destination lists used by campaigns. |
+| **Credit purchase** | `CreatePixCharge`, `GetChargeStatus` | Top up the prepaid balance with PIX from your system, follow the payment until it is credited, and read the balance. |
 | **Auth / utilities** | `GetUserID` | Credential validation and account introspection. |
 | **Audio files** | `CreateAudioFile`, `GetAudiosList` | Upload / list audio assets used by voice campaigns. |
 | **MCP (AI agents)** | `send_sms`, `make_tts_call`, `send_whatsapp`, … | Same capabilities exposed as MCP tools for Cursor, Claude, and custom agents. See [MCP overview](mcp/overview.md). |
