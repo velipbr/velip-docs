@@ -95,6 +95,7 @@ All pages are Markdown; links work when browsing this repository on GitHub.
 | --- | --- |
 | Buy credit with PIX | [credit/CreatePixCharge.md](credit/CreatePixCharge.md) |
 | Charge status and balance | [credit/GetChargeStatus.md](credit/GetChargeStatus.md) |
+| Guide: credit notification (webhook) | [credit/credit-notification.md](credit/credit-notification.md) |
 
 ## Auth
 

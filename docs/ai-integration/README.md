@@ -123,6 +123,7 @@ automatically when [EVENT, e.g. a new lead is created].
 | [GetWebRTC](../api/v2/voice/GetWebRTC.md) | The softphone credentials of each agent, fetched by your backend. |
 | [CreatePixCharge](../api/v2/credit/CreatePixCharge.md) | Buys credit with PIX: QR code, `reference` for safe retries, account requirements. |
 | [GetChargeStatus](../api/v2/credit/GetChargeStatus.md) | When the purchase is `credited`, and the account balance. |
+| [Credit notification](../api/v2/credit/credit-notification.md) | The webhook Velip sends when a purchase is credited, to confirm with `GetChargeStatus`. |
 
 If the agent gets only one URL, give it [`https://developers.velip.com.br/llms.txt`](https://developers.velip.com.br/llms.txt): the index of every page, with links to the raw Markdown. If the agent cannot open GitHub pages, give it the raw files, for example `https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/voice/MakeTTSCall.md`. A coding agent can also clone the repository with `git clone https://github.com/velipbr/velip-docs` and read the `docs/` folder.
 
@@ -222,7 +223,7 @@ the agent clicks "Call" and talks to the customer in the browser.
 
 ## Buy credit automatically
 
-Your system buys credit with PIX without anyone logging in to the portal: for example, when the balance drops below a threshold, or when your finance team approves a purchase. [`CreatePixCharge`](../api/v2/credit/CreatePixCharge.md) returns the QR code for whoever pays, and [`GetChargeStatus`](../api/v2/credit/GetChargeStatus.md) tells when the payment is `credited` and what the balance is.
+Your system buys credit with PIX without anyone logging in to the portal: for example, when the balance drops below a threshold, or when your finance team approves a purchase. [`CreatePixCharge`](../api/v2/credit/CreatePixCharge.md) returns the QR code for whoever pays, and [`GetChargeStatus`](../api/v2/credit/GetChargeStatus.md) tells when the payment is `credited` and what the balance is. Optionally, the [credit notification](../api/v2/credit/credit-notification.md) webhook tells your system as soon as the credit enters, so it checks `GetChargeStatus` only then.
 
 The account must be released by Velip (not under review), prepaid, and with CPF/CNPJ, e-mail and, in Brazil, the fiscal address complete in the portal: the payer is always the account registration.
 
@@ -236,6 +237,7 @@ aprovar uma compra].
 1. Leia a documentação da Velip em https://github.com/velipbr/velip-docs:
    - docs/api/v2/credit/CreatePixCharge.md
    - docs/api/v2/credit/GetChargeStatus.md
+   - docs/api/v2/credit/credit-notification.md (aviso por webhook, opcional)
    - docs/api/v2/authentication.md
    - docs/api/v2/errors.md
    A URL base da minha conta é https://vox.velip.com.br.
@@ -254,6 +256,9 @@ aprovar uma compra].
    - no máximo uma consulta por minuto enquanto o PIX está pendente, e o
      saldo (GetChargeStatus sem parâmetros) no máximo a cada 15 minutos:
      o limite é 60 consultas por hora, contando as do saldo;
+   - se eu usar o aviso de crédito por webhook: a rota que o recebe responde
+     2xx logo, só confirma pela GetChargeStatus e descarta aviso repetido
+     pelo charge_id;
    - tratamento dos códigos de erro, em especial 403, 409, 422 e 429.
 
 4. Use YOUR_TSID no lugar do token. Não me peça o token nesta conversa:
@@ -272,6 +277,7 @@ approves a purchase].
 1. Read the Velip docs at https://github.com/velipbr/velip-docs:
    - docs/api/v2/credit/CreatePixCharge.md
    - docs/api/v2/credit/GetChargeStatus.md
+   - docs/api/v2/credit/credit-notification.md (webhook notice, optional)
    - docs/api/v2/authentication.md
    - docs/api/v2/errors.md
    My account's base URL is https://vox.velip.com.br.
@@ -290,6 +296,9 @@ approves a purchase].
    - at most one status check per minute while the PIX is pending, and the
      balance (GetChargeStatus without parameters) at most every 15 minutes:
      the limit is 60 requests per hour, balance checks included;
+   - if I use the credit notification webhook: the route that receives it
+     answers 2xx at once, only confirms with GetChargeStatus, and discards
+     repeated notices by charge_id;
    - handling of the error codes, especially 403, 409, 422 and 429.
 
 4. Use YOUR_TSID instead of the real token. Do not ask me for the token

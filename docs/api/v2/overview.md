@@ -45,7 +45,7 @@ The [credit purchase](credit/CreatePixCharge.md) endpoints also use `403`, `404`
 - **[Messenger / Instagram](messenger/MakeMessenger.md)** — Send messages on Meta channels.
 - **[Email (OAuth)](email/SendEmailOAuth.md)** — Send transactional email through customer-owned Gmail or Microsoft 365 mailboxes, with templates and attachments.
 - **[Message status and reports](messages/GetMessageStatus.md)** — Status of SMS, WhatsApp and e-mail sends, bulk message campaigns, and totals per channel.
-- **[Credit purchase](credit/CreatePixCharge.md)** — Buy credit with PIX and check the charge status and the balance.
+- **[Credit purchase](credit/CreatePixCharge.md)** — Buy credit with PIX, check the charge status and the balance, and get a [webhook](credit/credit-notification.md) when a purchase is credited.
 - **[Auth helpers](auth-token/GetUserID.md)** — Validate credentials and introspect the current account.
 
 ## Read this first

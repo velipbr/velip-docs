@@ -81,6 +81,7 @@ Essentials for every REST request:
 
 - [CreatePixCharge](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/credit/CreatePixCharge.md): buy credit with PIX; QR code, idempotent `reference`, account requirements.
 - [GetChargeStatus](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/credit/GetChargeStatus.md): status of a purchase (`credited` means the credit is in the balance) and the current balance; 60 requests per hour.
+- [Credit notification guide](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/credit/credit-notification.md): webhook `POST` JSON when a purchase is credited (PIX, boleto or card, API or portal); retries, fields, and why to confirm with GetChargeStatus and discard repeats by `charge_id`.
 
 ## Account
 

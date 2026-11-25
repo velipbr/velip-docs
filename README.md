@@ -49,6 +49,7 @@ curl -X POST 'https://vox.velip.com.br/api/v2/MakeSMS.php' \
 | Send e-mail from a Gmail account (older, Gmail only) | [SendGmailOAuth](docs/api/v2/email/SendGmailOAuth.md) |
 | Buy credit with PIX | [CreatePixCharge](docs/api/v2/credit/CreatePixCharge.md) |
 | Check a payment or the balance | [GetChargeStatus](docs/api/v2/credit/GetChargeStatus.md) |
+| Be notified when a purchase is credited (webhook) | [Credit notification](docs/api/v2/credit/credit-notification.md) |
 | Check that the token works | [GetUserID](docs/api/v2/auth-token/GetUserID.md) |
 | Use Velip from Claude, Cursor or another AI client | [MCP server](docs/mcp/README.md) |
 

@@ -9,6 +9,9 @@ Returns the status of one credit purchase of the account (charge) and the curren
 
 Any charge of the account can be queried: PIX created by the API, and PIX, boleto or credit card purchases made in the Velip portal. Without `charge_id` and `reference`, it returns only the balance.
 
+> **Note**
+> Velip can also call your URL when a purchase is credited: see [Credit notification (webhook)](credit-notification.md). Use it to know when to check, and this endpoint to confirm the charge before acting; with the notification you can keep the checks well below the limit.
+
 ## Authentication
 
 Same credentials as the other v2 endpoints: token (`tsid` or the `Authorization: Bearer` header) or HTTP Basic. See [Authentication](../authentication.md).

@@ -19,6 +19,9 @@ Use it to top up the balance from your own system, without logging in to the por
 > **Note**
 > Release anything in your system only after `GetChargeStatus` returns `credited`. A `pending` charge may never be paid, and a QR code alone is not proof of payment.
 
+> **Tip**
+> To be told when the payment is credited instead of checking again and again, register a [credit notification](credit-notification.md) URL: Velip sends a `POST` with the `charge_id` as soon as the credit enters the balance. Confirm it with `GetChargeStatus` before acting.
+
 ## Requirements
 
 The account must:
