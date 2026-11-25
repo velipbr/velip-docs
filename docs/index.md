@@ -3,50 +3,56 @@ layout: default
 title: Velip Developers
 ---
 
-# Welcome to Velip
+# Velip Developers
 
-*Multichannel communications and AI agents for contact centers — voice, SMS, WhatsApp, Messenger, Instagram, and email under a single API.*
+*Voice calls, SMS, WhatsApp, Messenger, Instagram and e-mail through one REST API (v2), and the same capabilities as MCP tools for AI agents.*
 
-Velip is a Brazilian communications platform that powers contact centers, marketing teams, and product apps with a single backend for **voice, SMS, WhatsApp, Messenger, Instagram, and email**, plus AI agents (autonomous and real-time voice) on top of it.
+Velip is a Brazilian communications platform for contact centers, marketing teams and product apps, with AI agents (autonomous and real-time voice) on top of it. These docs cover what integrators need to connect to the **Velip Public API** and the **Velip MCP server**.
 
-These docs cover what integrators need to connect to the **Velip Public API** and the **Velip MCP server**. Internal product manuals (call center UI, agent design tools) live elsewhere.
+**For AI agents:** [`llms.txt`](https://developers.velip.com.br/llms.txt) is the index of every page, with links to the raw Markdown. The source is on [GitHub](https://github.com/velipbr/velip-docs).
 
-## What is here
+## Start here
 
-- **[Build your integration with an AI agent](ai-integration/README.md)** — let ChatGPT, Claude or Cursor read these docs and your CRM docs and write the integration, with an example prompt.
-- **[API v2 index](api/v2/README.md)** — table of contents for every documented endpoint.
-- **[MCP server index](mcp/README.md)** — connect AI clients (Cursor, Claude) to Velip tools.
-- **[API v2 overview](api/v2/overview.md)** — conventions and response shape.
-- **[Authentication](api/v2/authentication.md)** — `tsid` token, IP allowlists, brute-force policies.
-- **[Rate limits](api/v2/rate-limits.md)** — per-IP, per-user, and channel limits.
-- **[Error codes](api/v2/errors.md)** — numeric `status_code` reference.
+| You are | Start with |
+| --- | --- |
+| A developer integrating a system | [Getting started](api/v2/getting-started.md), then the page of the task below. |
+| An AI agent writing an integration | This page: the essentials, then the page of the task below. With only a URL, read [`llms.txt`](https://developers.velip.com.br/llms.txt). |
+| Someone who wants an AI agent to build it | [Build your integration with an AI agent](ai-integration/README.md): ready prompts. |
+| Using Claude, Cursor or another MCP client | [MCP server](mcp/README.md): the same capabilities as tools, at `https://vox20.velip.com.br/mcpserver/velip`. |
 
-## Channels at a glance
+## Essentials for every request
 
-| Channel | Endpoints | Notes |
-| --- | --- | --- |
-| **Voice (TTS / call)** | `MakeTTSCall`, `GetCallStatus`, `GetTTSVoices`, `PlayAudioFile`, `GetWebRTC` | Outbound TTS with DTMF/IVR, transfer to PA, recording, WebRTC softphone in your own app ([guide](api/v2/voice/webrtc-softphone.md)). |
-| **SMS** | `MakeSMS` | 160-char limit (auto-cut available); per-customer providers (Matrix, Wavy/Tww, Flash). |
-| **WhatsApp** | `MakeWhatsapp`, `ValidateWhatsAppNumber`, `CreateWhatsappTemplate`, `GetWATemplates`, `DeleteWhatsappTemplate`, `CheckTemplateStatus` | HSM/templates, text/audio/image/file/video, Gupshup or Meta Cloud API providers. |
-| **Messenger / Instagram** | `MakeMessenger`, `MakeInstagram` | Meta channels via business accounts. |
-| **Email** | `SendGmailOAuth` | Gmail OAuth-backed sender. |
-| **Campaigns / queues** | `CreateCampaign`, `ChangeCampaign`, `GetCampaignsList`, `CreateCenterQueue`, `GetCenterQueues` | Campaign lifecycle and contact-center queue management. |
-| **Destinations** | `CreateDestinationBase`, `GetDestinationsList` | Manage destination lists used by campaigns. |
-| **Credit purchase** | `CreatePixCharge`, `GetChargeStatus` | Top up the prepaid balance with PIX from your system, follow the payment until it is credited, and read the balance. |
-| **Auth / utilities** | `GetUserID` | Credential validation and account introspection. |
-| **Audio files** | `CreateAudioFile`, `GetAudiosList` | Upload / list audio assets used by voice campaigns. |
-| **MCP (AI agents)** | `send_sms`, `make_tts_call`, `send_whatsapp`, … | Same capabilities exposed as MCP tools for Cursor, Claude, and custom agents. See [MCP overview](mcp/overview.md). |
+- **URL:** `https://<base>/api/v2/<Endpoint>.php`, where `<base>` is the host of your account (usually `vox.velip.com.br`).
+- **Token:** a 30-character API token created in the Velip portal (integrations screen), sent as `Authorization: Bearer <token>` or as the `tsid` parameter. Keep it in your backend, never in the browser. See [Authentication](api/v2/authentication.md).
+- **Request:** `POST`, in JSON or form encoding. URL parameters override JSON body keys with the same name.
+- **Response:** JSON. `return.status` is `"OK"` or the error message, and `return.status_code` is `"0"` or the numeric error code. Each endpoint page says where the data come (inside `return` or in a sibling key).
+- **HTTP:** `200` success, `400` validation, `401` authentication. Some endpoints also use `403`, `404`, `409`, `422`, `429` and `5xx`; their pages list when. See [Error codes](api/v2/errors.md) and [Rate limits](api/v2/rate-limits.md).
 
-> **Note**
-> All REST endpoints are POST-by-default and accept `application/json` or `application/x-www-form-urlencoded`. URL parameters override JSON body keys.
+```bash
+curl -X POST 'https://vox.velip.com.br/api/v2/MakeSMS.php' \
+  -H 'Authorization: Bearer YOUR_TSID' \
+  -H 'Content-Type: application/json' \
+  -d '{ "dest": "5511999999999", "message": "Hello from Velip" }'
+```
 
-## Conventions used in these docs
+## I want to…
 
-- Sample base URL: `https://<base>` — replace with the host provided to your account (typically `https://vox.velip.com.br`).
-- MCP endpoint: `https://vox20.velip.com.br/mcpserver/velip`
-- Examples use `curl`. Most endpoints work the same with any HTTP client.
-- Token placeholder: `YOUR_TSID` (REST) or `YOUR_TOKEN_30_CHARS` (MCP Bearer). Get one via [Authentication](api/v2/authentication.md) or your account administrator.
-- Parameters marked **required** must be sent; otherwise the endpoint returns an error code listed under each endpoint page.
+| Task | Read |
+| --- | --- |
+| Send an SMS | [MakeSMS](api/v2/sms/MakeSMS.md) |
+| Send a WhatsApp message (a template outside the 24-hour window) | [MakeWhatsapp](api/v2/whatsapp/MakeWhatsapp.md), [GetWATemplates](api/v2/whatsapp/GetWATemplates.md) |
+| Manage WhatsApp templates or check a number | [CreateWhatsappTemplate](api/v2/whatsapp/CreateWhatsappTemplate.md), [CheckTemplateStatus](api/v2/whatsapp/CheckTemplateStatus.md), [DeleteWhatsappTemplate](api/v2/whatsapp/DeleteWhatsappTemplate.md), [ValidateWhatsAppNumber](api/v2/whatsapp/ValidateWhatsAppNumber.md) |
+| Place a voice call with text-to-speech or recorded audio | [MakeTTSCall](api/v2/voice/MakeTTSCall.md), [GetTTSVoices](api/v2/voice/GetTTSVoices.md) |
+| Get the result of a call | `rurl` in [MakeTTSCall](api/v2/voice/MakeTTSCall.md) (webhook), or [GetCallStatus](api/v2/voice/GetCallStatus.md) |
+| Upload, list or play audio files | [CreateAudioFile](api/v2/audio-files/CreateAudioFile.md), [GetAudiosList](api/v2/audio-files/GetAudiosList.md), [PlayAudioFile](api/v2/voice/PlayAudioFile.md) |
+| Make calls from my own agent screen (browser softphone) | [WebRTC softphone guide](api/v2/voice/webrtc-softphone.md), [GetWebRTC](api/v2/voice/GetWebRTC.md) |
+| Reach many contacts at once (campaign) | [CreateDestinationBase](api/v2/destinations/CreateDestinationBase.md), [CreateCampaign](api/v2/campaigns/CreateCampaign.md), [GetCampaignsList](api/v2/campaigns/GetCampaignsList.md), [ChangeCampaign](api/v2/campaigns/ChangeCampaign.md), [GetDestinationsList](api/v2/destinations/GetDestinationsList.md) |
+| Manage contact-center queues | [CreateCenterQueue](api/v2/campaigns/CreateCenterQueue.md), [GetCenterQueues](api/v2/campaigns/GetCenterQueues.md) |
+| Send on Messenger or Instagram | [MakeMessenger](api/v2/messenger/MakeMessenger.md), [MakeInstagram](api/v2/instagram/MakeInstagram.md) |
+| Send e-mail from a Gmail account | [SendGmailOAuth](api/v2/email/SendGmailOAuth.md) |
+| Buy credit with PIX | [CreatePixCharge](api/v2/credit/CreatePixCharge.md) |
+| Check a payment or the balance | [GetChargeStatus](api/v2/credit/GetChargeStatus.md) |
+| Check that the token works | [GetUserID](api/v2/auth-token/GetUserID.md) |
+| Use Velip from Claude, Cursor or another AI client | [MCP server](mcp/README.md) |
 
-Also available as [introduction.md](introduction.md) for direct links from the repository.
-<!-- Teste de deploy em 2026-11-02, depois da revisão de contas e chaves da Fase 10. -->
+Every endpoint, by area: [API v2 index](api/v2/README.md). Conventions and response shape: [API v2 overview](api/v2/overview.md).

@@ -1,0 +1,90 @@
+# Velip Developers
+
+> Velip is a Brazilian communications platform: voice calls (text-to-speech, IVR, transfer, recording, browser softphone), SMS, WhatsApp, Messenger, Instagram and e-mail through one REST API (v2), plus an MCP server that exposes the same capabilities as tools for AI agents. This file lists every documentation page with a link to its raw Markdown.
+
+Essentials for every REST request:
+
+- URL: `https://<base>/api/v2/<Endpoint>.php`, where `<base>` is the account host (usually `vox.velip.com.br`).
+- Token: a 30-character API token from the Velip portal (integrations screen), sent as `Authorization: Bearer <token>` or as the `tsid` parameter. It acts on behalf of the whole account: keep it in a backend, never in browser code, and never ask the user to paste it in a chat.
+- Request: `POST`, JSON or form encoding. URL parameters override JSON body keys.
+- Response: JSON with `return.status` ("OK" or the error message) and `return.status_code` ("0" or the numeric error code). Data come inside `return` or in a sibling key, as each endpoint page shows.
+- HTTP: 200 success, 400 validation, 401 authentication; some endpoints also use 403, 404, 409, 422, 429 and 5xx (listed on their pages).
+- Pick the page by task in the "I want to..." table of the [repository home](https://raw.githubusercontent.com/velipbr/velip-docs/main/README.md) or by area below.
+
+## Start
+
+- [Getting started](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/getting-started.md): base URL, request format, encoding, phone number format, a first example.
+- [Authentication](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/authentication.md): API token, HTTP Basic, IP allowlist, brute-force protection.
+- [Error codes](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/errors.md): numeric `status_code` values and HTTP statuses.
+- [Rate limits](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/rate-limits.md): per-IP, per-user, per-channel and per-endpoint limits.
+- [API v2 overview](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/overview.md): conventions and response shape.
+- [API v2 index](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/README.md): every endpoint by area.
+- [Build your integration with an AI agent](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/ai-integration/README.md): ready prompts for CRM-triggered calls, a browser softphone and buying credit.
+
+## SMS
+
+- [MakeSMS](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/sms/MakeSMS.md): send a single SMS.
+
+## WhatsApp
+
+- [MakeWhatsapp](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/whatsapp/MakeWhatsapp.md): send text, media or a template (required outside the 24-hour window).
+- [GetWATemplates](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/whatsapp/GetWATemplates.md): list the approved templates of a line.
+- [CreateWhatsappTemplate](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/whatsapp/CreateWhatsappTemplate.md): submit a template to Meta for approval.
+- [CheckTemplateStatus](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/whatsapp/CheckTemplateStatus.md): approval status of a submitted template.
+- [DeleteWhatsappTemplate](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/whatsapp/DeleteWhatsappTemplate.md): delete a template.
+- [ValidateWhatsAppNumber](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/whatsapp/ValidateWhatsAppNumber.md): check the Meta credentials and number of a Cloud API line.
+
+## Voice
+
+- [MakeTTSCall](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/voice/MakeTTSCall.md): outbound call with text-to-speech or recorded audio, IVR/DTMF, transfer, recording, result webhook (`rurl`).
+- [GetCallStatus](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/voice/GetCallStatus.md): call records, single or paginated, and the fields of the result webhook.
+- [GetTTSVoices](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/voice/GetTTSVoices.md): voices the account may use.
+- [PlayAudioFile](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/voice/PlayAudioFile.md): download or stream a stored audio or a call recording.
+- [GetWebRTC](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/voice/GetWebRTC.md): SIP credentials of a browser softphone for one agent.
+- [WebRTC softphone guide](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/voice/webrtc-softphone.md): calls from your own agent screen, with the browser code (JsSIP) and the `MakeTTSCall` that connects agent and customer.
+
+## Audio files
+
+- [CreateAudioFile](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/audio-files/CreateAudioFile.md): generate a TTS audio or upload an audio file.
+- [GetAudiosList](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/audio-files/GetAudiosList.md): list the account's audio files.
+
+## Campaigns and queues
+
+- [CreateCampaign](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/campaigns/CreateCampaign.md): voice campaign to many contacts (simple TTS, IVR questions, confirmation flow).
+- [ChangeCampaign](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/campaigns/ChangeCampaign.md): change schedule, throughput or status of a campaign.
+- [GetCampaignsList](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/campaigns/GetCampaignsList.md): search and list campaigns.
+- [CreateCenterQueue](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/campaigns/CreateCenterQueue.md): create a contact-center queue (voice or chat).
+- [GetCenterQueues](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/campaigns/GetCenterQueues.md): list the active queues.
+
+## Destinations
+
+- [CreateDestinationBase](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/destinations/CreateDestinationBase.md): upload a destination list (CSV or JSON) for campaigns.
+- [GetDestinationsList](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/destinations/GetDestinationsList.md): search destination lists and activate or deactivate them.
+
+## Messenger and Instagram
+
+- [MakeMessenger](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/messenger/MakeMessenger.md): send a Facebook Messenger message.
+- [MakeInstagram](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/instagram/MakeInstagram.md): send an Instagram Direct message.
+
+## E-mail
+
+- [SendGmailOAuth](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/email/SendGmailOAuth.md): send e-mail through the customer's Gmail account (OAuth).
+
+## Credit purchase
+
+- [CreatePixCharge](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/credit/CreatePixCharge.md): buy credit with PIX; QR code, idempotent `reference`, account requirements.
+- [GetChargeStatus](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/credit/GetChargeStatus.md): status of a purchase (`credited` means the credit is in the balance) and the current balance; 60 requests per hour.
+
+## Account
+
+- [GetUserID](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/auth-token/GetUserID.md): check that the credentials work and get the account ids.
+
+## MCP server
+
+- [MCP index](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/README.md): the MCP server at `https://vox20.velip.com.br/mcpserver/velip` and its pages.
+- [MCP overview](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/overview.md): what the server exposes and how it relates to the REST API.
+- [MCP getting started](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/getting-started.md): token, connectivity check, first SMS.
+- [MCP authentication](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/authentication.md): Bearer tokens and their relation to the REST token.
+- [MCP permissions](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/permissions.md): channel access per token and tool filtering.
+- [MCP tools reference](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/tools/README.md): one page per tool (`send_sms`, `make_tts_call`, `send_whatsapp`, campaigns, destination bases, templates and more).
+- Clients: [Cursor](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/clients/cursor.md), [Claude Desktop](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/clients/claude-desktop.md), [curl](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/clients/curl.md), [custom client](https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/mcp/clients/custom.md).

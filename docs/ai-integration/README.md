@@ -124,7 +124,7 @@ automatically when [EVENT, e.g. a new lead is created].
 | [CreatePixCharge](../api/v2/credit/CreatePixCharge.md) | Buys credit with PIX: QR code, `reference` for safe retries, account requirements. |
 | [GetChargeStatus](../api/v2/credit/GetChargeStatus.md) | When the purchase is `credited`, and the account balance. |
 
-If the agent cannot open GitHub pages, give it the raw files, for example `https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/voice/MakeTTSCall.md`. A coding agent can also clone the repository with `git clone https://github.com/velipbr/velip-docs` and read the `docs/` folder.
+If the agent gets only one URL, give it [`https://developers.velip.com.br/llms.txt`](https://developers.velip.com.br/llms.txt): the index of every page, with links to the raw Markdown. If the agent cannot open GitHub pages, give it the raw files, for example `https://raw.githubusercontent.com/velipbr/velip-docs/main/docs/api/v2/voice/MakeTTSCall.md`. A coding agent can also clone the repository with `git clone https://github.com/velipbr/velip-docs` and read the `docs/` folder.
 
 ## Before going live
 

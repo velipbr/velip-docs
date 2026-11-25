@@ -1,70 +1,61 @@
-# Velip Docs
+# Velip Developers
 
-Public documentation for the **Velip** communications platform.
+Public documentation of the **Velip** platform: voice calls, SMS, WhatsApp, Messenger, Instagram and e-mail through one REST API (v2) and one MCP server for AI agents.
 
-**Read online:** [https://developers.velip.com.br](https://developers.velip.com.br)
+**Read online:** [developers.velip.com.br](https://developers.velip.com.br) · **For AI agents:** [`llms.txt`](https://developers.velip.com.br/llms.txt) (index of every page, with links to the raw Markdown)
 
-This repository is written in **plain Markdown** so it reads well on [GitHub](https://github.com/velipbr/velip-docs) (file tree, search, and blame). Cross-page links use **relative paths** (e.g. `../authentication.md`) so they work when browsing the repo on github.com.
+## Start here
 
-**Start here:** [`docs/introduction.md`](docs/introduction.md) — product overview and links into the API manual.
+| You are | Start with |
+| --- | --- |
+| A developer integrating a system | [Getting started](docs/api/v2/getting-started.md), then the page of the task below. |
+| An AI agent writing an integration | This page: the essentials, then the page of the task below. With only a URL, read [`llms.txt`](https://developers.velip.com.br/llms.txt). |
+| Someone who wants an AI agent to build it | [Build your integration with an AI agent](docs/ai-integration/README.md): ready prompts. |
+| Using Claude, Cursor or another MCP client | [MCP server](docs/mcp/README.md): the same capabilities as tools. |
 
-## What you find here
+## Essentials for every request
 
-- **API v2 manual** — every public endpoint under `https://<base>/api/v2/*.php`: parameters, examples, responses, and endpoint-specific error codes.
-- **MCP server** — connect AI clients (Cursor, Claude) to Velip tools via MCP Streamable HTTP.
-- **[Build your integration with an AI agent](docs/ai-integration/README.md)** — let ChatGPT, Claude or Cursor read these docs and your CRM docs and write the integration, with an example prompt.
-- **Cross-cutting guides** — [authentication](docs/api/v2/authentication.md), [error codes](docs/api/v2/errors.md), [rate limits](docs/api/v2/rate-limits.md), [getting started](docs/api/v2/getting-started.md).
+- **URL:** `https://<base>/api/v2/<Endpoint>.php`, where `<base>` is the host of your account (usually `vox.velip.com.br`).
+- **Token:** a 30-character API token created in the Velip portal (integrations screen), sent as `Authorization: Bearer <token>` or as the `tsid` parameter. Keep it in your backend, never in the browser. See [Authentication](docs/api/v2/authentication.md).
+- **Request:** `POST`, in JSON or form encoding. URL parameters override JSON body keys with the same name.
+- **Response:** JSON. `return.status` is `"OK"` or the error message, and `return.status_code` is `"0"` or the numeric error code. Each endpoint page says where the data come (inside `return` or in a sibling key).
+- **HTTP:** `200` success, `400` validation, `401` authentication. Some endpoints also use `403`, `404`, `409`, `422`, `429` and `5xx`; their pages list when. See [Error codes](docs/api/v2/errors.md) and [Rate limits](docs/api/v2/rate-limits.md).
 
-## Layout
-
-```
-docs/
-  index.md                     # landing (GitHub Pages home)
-  introduction.md              # overview for integrators
-  ai-integration/              # build the integration with an AI agent (prompt + diagram)
-  DEPLOY.md                    # GitHub Pages + DNS setup
-  api/v2/
-    README.md                  # index of all v2 pages
-    overview.md
-    getting-started.md
-    authentication.md
-    errors.md
-    rate-limits.md
-    sms/
-    whatsapp/
-    voice/
-    audio-files/
-    campaigns/
-    destinations/
-    messenger/
-    instagram/
-    email/
-    credit/                    # buy credit with PIX, charge status and balance
-    auth-token/
-  mcp/
-    README.md                  # MCP section index
-    overview.md
-    getting-started.md
-    authentication.md
-    permissions.md
-    clients/                   # Cursor, Claude, curl
-    tools/                     # 13 MCP tools reference
+```bash
+curl -X POST 'https://vox.velip.com.br/api/v2/MakeSMS.php' \
+  -H 'Authorization: Bearer YOUR_TSID' \
+  -H 'Content-Type: application/json' \
+  -d '{ "dest": "5511999999999", "message": "Hello from Velip" }'
 ```
 
-## Publishing
+## I want to…
 
-See [`docs/DEPLOY.md`](docs/DEPLOY.md) for GitHub Pages and DNS configuration (`developers.velip.com.br`).
+| Task | Read |
+| --- | --- |
+| Send an SMS | [MakeSMS](docs/api/v2/sms/MakeSMS.md) |
+| Send a WhatsApp message (a template outside the 24-hour window) | [MakeWhatsapp](docs/api/v2/whatsapp/MakeWhatsapp.md), [GetWATemplates](docs/api/v2/whatsapp/GetWATemplates.md) |
+| Manage WhatsApp templates or check a number | [CreateWhatsappTemplate](docs/api/v2/whatsapp/CreateWhatsappTemplate.md), [CheckTemplateStatus](docs/api/v2/whatsapp/CheckTemplateStatus.md), [DeleteWhatsappTemplate](docs/api/v2/whatsapp/DeleteWhatsappTemplate.md), [ValidateWhatsAppNumber](docs/api/v2/whatsapp/ValidateWhatsAppNumber.md) |
+| Place a voice call with text-to-speech or recorded audio | [MakeTTSCall](docs/api/v2/voice/MakeTTSCall.md), [GetTTSVoices](docs/api/v2/voice/GetTTSVoices.md) |
+| Get the result of a call | `rurl` in [MakeTTSCall](docs/api/v2/voice/MakeTTSCall.md) (webhook), or [GetCallStatus](docs/api/v2/voice/GetCallStatus.md) |
+| Upload, list or play audio files | [CreateAudioFile](docs/api/v2/audio-files/CreateAudioFile.md), [GetAudiosList](docs/api/v2/audio-files/GetAudiosList.md), [PlayAudioFile](docs/api/v2/voice/PlayAudioFile.md) |
+| Make calls from my own agent screen (browser softphone) | [WebRTC softphone guide](docs/api/v2/voice/webrtc-softphone.md), [GetWebRTC](docs/api/v2/voice/GetWebRTC.md) |
+| Reach many contacts at once (campaign) | [CreateDestinationBase](docs/api/v2/destinations/CreateDestinationBase.md), [CreateCampaign](docs/api/v2/campaigns/CreateCampaign.md), [GetCampaignsList](docs/api/v2/campaigns/GetCampaignsList.md), [ChangeCampaign](docs/api/v2/campaigns/ChangeCampaign.md), [GetDestinationsList](docs/api/v2/destinations/GetDestinationsList.md) |
+| Manage contact-center queues | [CreateCenterQueue](docs/api/v2/campaigns/CreateCenterQueue.md), [GetCenterQueues](docs/api/v2/campaigns/GetCenterQueues.md) |
+| Send on Messenger or Instagram | [MakeMessenger](docs/api/v2/messenger/MakeMessenger.md), [MakeInstagram](docs/api/v2/instagram/MakeInstagram.md) |
+| Send e-mail from a Gmail account | [SendGmailOAuth](docs/api/v2/email/SendGmailOAuth.md) |
+| Buy credit with PIX | [CreatePixCharge](docs/api/v2/credit/CreatePixCharge.md) |
+| Check a payment or the balance | [GetChargeStatus](docs/api/v2/credit/GetChargeStatus.md) |
+| Check that the token works | [GetUserID](docs/api/v2/auth-token/GetUserID.md) |
+| Use Velip from Claude, Cursor or another AI client | [MCP server](docs/mcp/README.md) |
 
-## Editing
-
-1. Edit the relevant `.md` file under `docs/`.
-2. Keep internal links **relative** to the file you are editing (same rule as above).
-3. Open a PR against `main`.
+Every endpoint, by area: [API v2 index](docs/api/v2/README.md).
 
 ## Out of scope
 
-- SDKs / client libraries — not maintained in this repo.
-- Internal architecture and runbooks — private repos only.
+- SDKs and client libraries: not maintained here.
+- Internal architecture and runbooks: private repositories.
+
+Editing these docs: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Contact
 
