@@ -24,11 +24,16 @@ A new endpoint, or a renamed one, goes into **all** of these in the same commit:
 
 New error codes or HTTP statuses that apply across endpoints also go into `docs/api/v2/errors.md`; new limits into `docs/api/v2/rate-limits.md`.
 
+Before committing, run `python3 scripts/check_catalog.py`. It checks that every page under `docs/api/v2/<area>/` is in the first four files above and that their links work. GitHub runs the same check on every push and pull request (workflow *Check catalog*); a red check means a list or a link is missing.
+
 ## Layout
 
 ```
 README.md                      # repository home (essentials + "I want to…")
 CONTRIBUTING.md                # this file
+CLAUDE.md                      # rules for AI coding agents editing this repository
+scripts/check_catalog.py       # pages listed everywhere and links valid
+.github/workflows/             # runs the check on every push and pull request
 docs/
   index.md                     # site home (GitHub Pages)
   introduction.md              # old link, points to index.md
