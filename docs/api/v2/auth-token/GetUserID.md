@@ -68,7 +68,7 @@ This endpoint is gated by [`log_api_v2`](../authentication.md) — most failures
 | --- | --- | --- |
 | `100` | `fail authentication` | Credentials wrong, account inactive, or required input missing. |
 | `101` | `Token is not valid` | Token malformed or expired (only 10- and 30-character tokens are accepted). |
-| `110` | `Inactive account` | The customer account is disabled. |
+| `110` | `Inactive account` | The customer account is disabled. If it is under review, the message is `Account under review. Contact support.` |
 | `131` | `IP trials exceeded` | Too many attempts from this IP in 10 minutes. |
 | `132` | `user trials exceeded` | Too many failed attempts for this user in 10 minutes. |
 | `140` | `invalid user/pass` | Wrong username or password. |

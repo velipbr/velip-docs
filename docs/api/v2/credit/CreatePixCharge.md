@@ -153,6 +153,7 @@ curl -X POST 'https://<base>/api/v2/CreatePixCharge.php' \
 | 403 | `211` | `Postpaid account: credit purchase does not apply` | The account is postpaid. |
 | 403 | `212` | `Credit purchase not enabled for this account` | Credit purchase is not enabled for the account. Contact your account manager. |
 | 403 | `213` | `Inactive account` | The account was disabled. |
+| 403 | `110` | `Account under review. Contact support.` | The account was put under review. No new charge is created; a charge already paid is credited normally. |
 | 403 | `214` | `Credential not allowed for this API` | The credential is not a user token or user login. |
 | 409 | `220` | `Reference already used with another amount` | A pending charge with this `reference` has a different amount. |
 | 409 | `221` | `Reference already paid` | A charge with this `reference` was already paid (or refunded). Nothing was created. |

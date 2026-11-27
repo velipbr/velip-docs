@@ -36,7 +36,7 @@ Successful responses use `status: "OK"` and `status_code: "0"`.
 | --- | --- | --- |
 | `100` | `fail authentication` | Authentication routine did not return a usable account context. Check `tsid`, `sid`, or HTTP Basic. |
 | `102` | `SID not found` | The `sid`/`tsid` is unknown or has expired. Excessive `102`s trigger the anti-probe blacklist. |
-| `110` | `account inactive` | The customer account is disabled. |
+| `110` | `account inactive` | The customer account is disabled, or it is under review (message `Account under review. Contact support.`). In both cases every credential of the account (token, username and password, MCP connector) is refused until support re-enables it. |
 | `114` | `Token not allowed for REST API` | The token was created for the MCP Server (manual MCP token or OAuth connector) and is only accepted through it. Use a regular API token for direct REST calls. |
 | `123` | `permission denied` | The token has insufficient permissions for this endpoint. |
 | `130` | `no user/pass` | Required `username`/`password` not sent on a Basic-only flow. |
